@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { FormEvent, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
@@ -19,6 +19,7 @@ import {
   Wrench,
 } from "lucide-react"
 import { useLanguage } from "@/components/providers/language-provider"
+import TurnstileWidget from "@/components/ui/turnstile-widget"
 
 const copy = {
   es: {
@@ -80,6 +81,10 @@ const copy = {
     consent:
       "Al enviar, aceptas que nos pongamos en contacto contigo para discutir tu proyecto. Tu información no será compartida con terceros.",
     submit: "Enviar solicitud",
+    sending: "Enviando...",
+    successMessage: "Solicitud enviada. Te responderemos con una propuesta inicial.",
+    errorMessage: "No pudimos enviar la solicitud. Verifica los datos e intenta de nuevo.",
+    captchaMessage: "Completa el captcha para continuar.",
   },
   en: {
     badge: "Custom quote",
@@ -140,6 +145,10 @@ const copy = {
     consent:
       "By submitting, you agree that we may contact you to discuss your project. Your information will not be shared with third parties.",
     submit: "Send request",
+    sending: "Sending...",
+    successMessage: "Request sent. We will reply with an initial proposal.",
+    errorMessage: "We could not send the request. Please review your data and try again.",
+    captchaMessage: "Please complete the captcha to continue.",
   },
 }
 
@@ -149,12 +158,82 @@ const perkIcons = [Clock, FileText, CheckCircle2]
 export default function QuoteSection() {
   const { lang } = useLanguage()
   const t = copy[lang]
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""
   const [selectedServices, setSelectedServices] = useState<string[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [status, setStatus] = useState<{ type: "idle" | "success" | "error"; message: string }>({
+    type: "idle",
+    message: "",
+  })
+  const [captchaToken, setCaptchaToken] = useState("")
+
+  const statusClassName = useMemo(() => {
+    if (status.type === "success") {
+      return "text-green-600"
+    }
+
+    if (status.type === "error") {
+      return "text-red-600"
+    }
+
+    return ""
+  }, [status.type])
 
   const toggleService = (id: string) => {
     setSelectedServices((prev) =>
       prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
     )
+  }
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (!captchaToken) {
+      setStatus({ type: "error", message: t.captchaMessage })
+      return
+    }
+
+    setIsSubmitting(true)
+    setStatus({ type: "idle", message: "" })
+
+    const form = event.currentTarget
+    const formData = new FormData(form)
+
+    const payload = {
+      services: selectedServices,
+      projectName: String(formData.get("projectName") || ""),
+      projectDescription: String(formData.get("projectDescription") || ""),
+      timeline: String(formData.get("timeline") || ""),
+      budget: String(formData.get("budget") || ""),
+      fullName: String(formData.get("fullName") || ""),
+      company: String(formData.get("company") || ""),
+      email: String(formData.get("email") || ""),
+      phone: String(formData.get("phone") || ""),
+      captchaToken,
+      hp: String(formData.get("hp") || ""),
+    }
+
+    try {
+      const response = await fetch("/api/leads/quote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        setStatus({ type: "error", message: t.errorMessage })
+        return
+      }
+
+      form.reset()
+      setSelectedServices([])
+      setCaptchaToken("")
+      setStatus({ type: "success", message: t.successMessage })
+    } catch {
+      setStatus({ type: "error", message: t.errorMessage })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -193,7 +272,7 @@ export default function QuoteSection() {
           {/* Quote form */}
           <Card className="bg-card border-border shadow-2xl">
             <CardContent className="p-6 md:p-10">
-              <form className="space-y-8">
+              <form className="space-y-8" onSubmit={handleSubmit}>
                 {/* Step 1: Service type */}
                 <div>
                   <div className="flex items-center gap-2 mb-4">
@@ -212,11 +291,10 @@ export default function QuoteSection() {
                           key={service.id}
                           type="button"
                           onClick={() => toggleService(service.id)}
-                          className={`flex items-center gap-3 p-4 rounded-lg border transition-all duration-300 ${
-                            isActive
+                          className={`flex items-center gap-3 p-4 rounded-lg border transition-all duration-300 ${isActive
                               ? "bg-primary/10 border-primary text-primary shadow-md shadow-primary/10"
                               : "bg-background border-border hover:border-primary/50 text-muted-foreground hover:text-foreground"
-                          }`}
+                            }`}
                         >
                           <Icon className="h-5 w-5 flex-shrink-0" />
                           <span className="text-sm font-medium text-left">{service.label}</span>
@@ -239,19 +317,27 @@ export default function QuoteSection() {
                   </div>
                   <div className="space-y-4">
                     <input
+                      name="projectName"
                       type="text"
                       placeholder={t.projectName}
+                      required
                       className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
                     />
                     <textarea
+                      name="projectDescription"
                       placeholder={t.projectDesc}
                       rows={5}
+                      required
                       className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground resize-none transition-all duration-300"
                     />
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="relative">
                         <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <select className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300 appearance-none">
+                        <select
+                          name="timeline"
+                          required
+                          className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300 appearance-none"
+                        >
                           <option value="">{t.timelinePlaceholder}</option>
                           {t.timelines.map((time) => (
                             <option key={time} value={time}>
@@ -262,7 +348,11 @@ export default function QuoteSection() {
                       </div>
                       <div className="relative">
                         <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <select className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300 appearance-none">
+                        <select
+                          name="budget"
+                          required
+                          className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300 appearance-none"
+                        >
                           <option value="">{t.budgetPlaceholder}</option>
                           {t.budgetRanges.map((b) => (
                             <option key={b} value={b}>
@@ -285,35 +375,66 @@ export default function QuoteSection() {
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
                     <input
+                      name="fullName"
                       type="text"
                       placeholder={t.fullName}
+                      required
                       className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
                     />
                     <input
+                      name="company"
                       type="text"
                       placeholder={t.company}
                       className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
                     />
                     <input
+                      name="email"
                       type="email"
                       placeholder={t.email}
+                      required
                       className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
                     />
                     <input
+                      name="phone"
                       type="tel"
                       placeholder={t.phone}
+                      required
                       className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
                     />
                   </div>
                 </div>
 
+                <input
+                  type="text"
+                  name="hp"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  className="hidden"
+                  aria-hidden="true"
+                />
+
+                {siteKey ? (
+                  <TurnstileWidget
+                    siteKey={siteKey}
+                    onSuccess={(token) => setCaptchaToken(token)}
+                    onExpire={() => setCaptchaToken("")}
+                    onError={() => setCaptchaToken("")}
+                  />
+                ) : (
+                  <p className="text-sm text-red-600">Captcha no configurado. Falta NEXT_PUBLIC_TURNSTILE_SITE_KEY.</p>
+                )}
+
+                {status.message ? <p className={`text-sm ${statusClassName}`}>{status.message}</p> : null}
+
                 <div className="pt-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
                   <p className="text-xs text-muted-foreground text-center sm:text-left">{t.consent}</p>
                   <Button
+                    type="submit"
                     size="lg"
+                    disabled={isSubmitting || !siteKey}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto transition-all duration-300 hover:scale-105 hover:shadow-xl group whitespace-nowrap"
                   >
-                    {t.submit}
+                    {isSubmitting ? t.sending : t.submit}
                     <Send className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </Button>
                 </div>

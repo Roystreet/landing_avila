@@ -1,8 +1,10 @@
 "use client"
 
+import { FormEvent, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Mail, Phone, MapPin, Rocket, Clock, Users, Award, MessageCircle } from "lucide-react"
 import { useLanguage } from "@/components/providers/language-provider"
+import TurnstileWidget from "@/components/ui/turnstile-widget"
 
 const WHATSAPP_DISPLAY = "+58 416 602 24 78"
 
@@ -55,6 +57,10 @@ const copy = {
     contactPref: "¿Cómo prefieres que te contactemos?",
     contactChannels: ["Email", "WhatsApp", "Llamada telefónica", "Reunión virtual"],
     submit: "Enviar mensaje",
+    sending: "Enviando...",
+    successMessage: "Mensaje enviado. Te responderemos pronto.",
+    errorMessage: "No pudimos enviar tu mensaje. Verifica los datos e intenta de nuevo.",
+    captchaMessage: "Completa el captcha para continuar.",
     extra: [
       { title: "Respuesta en 24h", desc: "Te contactamos dentro de las próximas 24 horas hábiles" },
       { title: "Equipo dedicado", desc: "Un equipo asignado exclusivamente a tu proyecto" },
@@ -109,6 +115,10 @@ const copy = {
     contactPref: "How would you like us to contact you?",
     contactChannels: ["Email", "WhatsApp", "Phone call", "Virtual meeting"],
     submit: "Send message",
+    sending: "Sending...",
+    successMessage: "Message sent. We will get back to you soon.",
+    errorMessage: "We could not send your message. Please review your data and try again.",
+    captchaMessage: "Please complete the captcha to continue.",
     extra: [
       { title: "24h reply", desc: "We'll reach out within the next 24 business hours" },
       { title: "Dedicated team", desc: "A team assigned exclusively to your project" },
@@ -123,6 +133,75 @@ const extraIcons = [MessageCircle, Users, Award]
 export default function ContactSection() {
   const { lang } = useLanguage()
   const t = copy[lang]
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [status, setStatus] = useState<{ type: "idle" | "success" | "error"; message: string }>({
+    type: "idle",
+    message: "",
+  })
+  const [captchaToken, setCaptchaToken] = useState("")
+
+  const statusClassName = useMemo(() => {
+    if (status.type === "success") {
+      return "text-green-600"
+    }
+
+    if (status.type === "error") {
+      return "text-red-600"
+    }
+
+    return ""
+  }, [status.type])
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (!captchaToken) {
+      setStatus({ type: "error", message: t.captchaMessage })
+      return
+    }
+
+    setIsSubmitting(true)
+    setStatus({ type: "idle", message: "" })
+
+    const form = event.currentTarget
+    const formData = new FormData(form)
+
+    const payload = {
+      fullName: String(formData.get("fullName") || ""),
+      company: String(formData.get("company") || ""),
+      email: String(formData.get("email") || ""),
+      phone: String(formData.get("phone") || ""),
+      projectType: String(formData.get("projectType") || ""),
+      budget: String(formData.get("budget") || ""),
+      industry: String(formData.get("industry") || ""),
+      projectDescription: String(formData.get("projectDescription") || ""),
+      contactPreferences: formData.getAll("contactPreferences").map(String),
+      captchaToken,
+      hp: String(formData.get("hp") || ""),
+    }
+
+    try {
+      const response = await fetch("/api/leads/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        setStatus({ type: "error", message: t.errorMessage })
+        return
+      }
+
+      form.reset()
+      setCaptchaToken("")
+      setStatus({ type: "success", message: t.successMessage })
+    } catch {
+      setStatus({ type: "error", message: t.errorMessage })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <section id="contacto" className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
@@ -183,14 +262,17 @@ export default function ContactSection() {
             <div className="lg:col-span-2">
               <div className="bg-background rounded-lg border border-border p-8">
                 <h3 className="text-xl font-semibold text-foreground mb-6">{t.formHeading}</h3>
-                <form className="space-y-6">
+                <form className="space-y-6" onSubmit={handleSubmit}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
+                      name="fullName"
                       type="text"
                       placeholder={t.fullName}
+                      required
                       className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
                     />
                     <input
+                      name="company"
                       type="text"
                       placeholder={t.company}
                       className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
@@ -198,19 +280,25 @@ export default function ContactSection() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
+                      name="email"
                       type="email"
                       placeholder={t.emailLabel}
+                      required
                       className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
                     />
                     <input
+                      name="phone"
                       type="tel"
                       placeholder={t.phoneLabel}
+                      required
                       className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
                     />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <select
+                      name="projectType"
                       defaultValue=""
+                      required
                       className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
                     >
                       <option value="" disabled>
@@ -223,7 +311,9 @@ export default function ContactSection() {
                       ))}
                     </select>
                     <select
+                      name="budget"
                       defaultValue=""
+                      required
                       className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
                     >
                       <option value="" disabled>
@@ -237,13 +327,16 @@ export default function ContactSection() {
                     </select>
                   </div>
                   <input
+                    name="industry"
                     type="text"
                     placeholder={t.industry}
                     className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
                   />
                   <textarea
+                    name="projectDescription"
                     placeholder={t.projectDesc}
                     rows={5}
+                    required
                     className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground resize-none transition-all duration-300 hover:border-primary/50"
                   />
 
@@ -252,15 +345,46 @@ export default function ContactSection() {
                     <div className="flex flex-wrap gap-4">
                       {t.contactChannels.map((channel) => (
                         <label key={channel} className="flex items-center space-x-2">
-                          <input type="checkbox" className="rounded border-border text-primary focus:ring-primary" />
+                          <input
+                            name="contactPreferences"
+                            value={channel}
+                            type="checkbox"
+                            className="rounded border-border text-primary focus:ring-primary"
+                          />
                           <span className="text-sm text-muted-foreground">{channel}</span>
                         </label>
                       ))}
                     </div>
                   </div>
 
-                  <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group">
-                    {t.submit}
+                  <input
+                    type="text"
+                    name="hp"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    className="hidden"
+                    aria-hidden="true"
+                  />
+
+                  {siteKey ? (
+                    <TurnstileWidget
+                      siteKey={siteKey}
+                      onSuccess={(token) => setCaptchaToken(token)}
+                      onExpire={() => setCaptchaToken("")}
+                      onError={() => setCaptchaToken("")}
+                    />
+                  ) : (
+                    <p className="text-sm text-red-600">Captcha no configurado. Falta NEXT_PUBLIC_TURNSTILE_SITE_KEY.</p>
+                  )}
+
+                  {status.message ? <p className={`text-sm ${statusClassName}`}>{status.message}</p> : null}
+
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting || !siteKey}
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group"
+                  >
+                    {isSubmitting ? t.sending : t.submit}
                     <Rocket className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </Button>
                 </form>
