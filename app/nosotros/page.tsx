@@ -1,19 +1,26 @@
 import AboutSection from "@/components/sections/about-section"
 import Footer from "@/components/layout/footer"
+import { PageHero } from "@/components/layout/page-hero"
 
 export default function NosotrosPage() {
   return (
     <div className="min-h-screen bg-background pt-16">
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
-            Sobre <span className="text-primary">Nosotros</span>
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Un equipo de expertos apasionados por la innovación tecnológica
-          </p>
-        </div>
-      </div>
+      <PageHero
+        copy={{
+          es: {
+            titleA: "Sobre",
+            titleHighlight: "Nosotros",
+            subtitle:
+              "Un equipo técnico enfocado en entregar software útil, con documentación clara y acompañamiento post-lanzamiento.",
+          },
+          en: {
+            titleA: "About",
+            titleHighlight: "Us",
+            subtitle:
+              "A technical team focused on delivering useful software, with clear documentation and post-launch support.",
+          },
+        }}
+      />
       <AboutSection />
       <Footer />
     </div>

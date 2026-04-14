@@ -18,34 +18,137 @@ import {
   Bot,
   Wrench,
 } from "lucide-react"
+import { useLanguage } from "@/components/providers/language-provider"
 
-const serviceTypes = [
-  { id: "web", label: "Desarrollo Web", icon: Globe },
-  { id: "apps", label: "Aplicaciones", icon: Smartphone },
-  { id: "sistemas", label: "Sistemas Web", icon: LayoutDashboard },
-  { id: "cloud", label: "Cloud / DevOps", icon: Cloud },
-  { id: "ia", label: "Agentes de IA", icon: Bot },
-  { id: "otro", label: "Otro / A medida", icon: Wrench },
-]
+const copy = {
+  es: {
+    badge: "Cotización personalizada",
+    title: "Cuéntanos tu proyecto y te",
+    titleHighlight: "preparamos una propuesta",
+    intro:
+      "Llena el formulario con los detalles de lo que necesitas. Mientras más claro seas sobre el alcance, más precisa será nuestra estimación.",
+    perks: [
+      {
+        title: "Respuesta en 24h hábiles",
+        description: "Revisamos tu caso y te devolvemos una propuesta inicial en el próximo día laboral.",
+      },
+      {
+        title: "Propuesta detallada por escrito",
+        description: "Alcance, entregables, tiempos, equipo asignado y presupuesto — todo documentado.",
+      },
+      {
+        title: "Sin compromiso",
+        description: "La cotización es gratuita. Si no seguimos adelante, no hay costos ocultos.",
+      },
+    ],
+    step1Title: "¿Qué tipo de proyecto necesitas?",
+    step1Hint: "(puedes seleccionar varios)",
+    services: [
+      { id: "web", label: "Desarrollo Web" },
+      { id: "apps", label: "Aplicaciones" },
+      { id: "sistemas", label: "Sistemas Web" },
+      { id: "cloud", label: "Cloud / DevOps" },
+      { id: "ia", label: "Agentes de IA" },
+      { id: "otro", label: "Otro / A medida" },
+    ],
+    step2Title: "Describe tu proyecto",
+    projectName: "Nombre del proyecto o producto",
+    projectDesc:
+      "Objetivos, usuarios, funcionalidades clave, integraciones necesarias, diseño existente o inspiración...",
+    timelinePlaceholder: "Plazo estimado",
+    budgetPlaceholder: "Presupuesto disponible (USD)",
+    timelines: [
+      "Urgente (menos de 1 mes)",
+      "1 - 3 meses",
+      "3 - 6 meses",
+      "Más de 6 meses",
+      "Flexible",
+    ],
+    budgetRanges: [
+      "Menos de $2,000",
+      "$2,000 - $5,000",
+      "$5,000 - $15,000",
+      "$15,000 - $50,000",
+      "$50,000 +",
+      "Por definir",
+    ],
+    step3Title: "¿Cómo te contactamos?",
+    fullName: "Nombre completo",
+    company: "Empresa (opcional)",
+    email: "Email de contacto",
+    phone: "Teléfono o WhatsApp",
+    consent:
+      "Al enviar, aceptas que nos pongamos en contacto contigo para discutir tu proyecto. Tu información no será compartida con terceros.",
+    submit: "Enviar solicitud",
+  },
+  en: {
+    badge: "Custom quote",
+    title: "Tell us about your project and we'll",
+    titleHighlight: "send you a proposal",
+    intro:
+      "Fill out the form with the details of what you need. The clearer you are about scope, the more precise our estimate will be.",
+    perks: [
+      {
+        title: "Reply within 24 business hours",
+        description: "We review your case and come back with an initial proposal the next business day.",
+      },
+      {
+        title: "Detailed written proposal",
+        description: "Scope, deliverables, timeline, assigned team and budget — all documented.",
+      },
+      {
+        title: "No commitment",
+        description: "The quote is free. If we don't move forward, there are no hidden costs.",
+      },
+    ],
+    step1Title: "What type of project do you need?",
+    step1Hint: "(you can select multiple)",
+    services: [
+      { id: "web", label: "Web Development" },
+      { id: "apps", label: "Applications" },
+      { id: "sistemas", label: "Web Systems" },
+      { id: "cloud", label: "Cloud / DevOps" },
+      { id: "ia", label: "AI Agents" },
+      { id: "otro", label: "Other / Custom" },
+    ],
+    step2Title: "Describe your project",
+    projectName: "Project or product name",
+    projectDesc:
+      "Goals, users, key features, required integrations, existing design or inspiration...",
+    timelinePlaceholder: "Estimated timeline",
+    budgetPlaceholder: "Available budget (USD)",
+    timelines: [
+      "Urgent (less than 1 month)",
+      "1 - 3 months",
+      "3 - 6 months",
+      "More than 6 months",
+      "Flexible",
+    ],
+    budgetRanges: [
+      "Less than $2,000",
+      "$2,000 - $5,000",
+      "$5,000 - $15,000",
+      "$15,000 - $50,000",
+      "$50,000 +",
+      "To be defined",
+    ],
+    step3Title: "How should we reach you?",
+    fullName: "Full name",
+    company: "Company (optional)",
+    email: "Contact email",
+    phone: "Phone or WhatsApp",
+    consent:
+      "By submitting, you agree that we may contact you to discuss your project. Your information will not be shared with third parties.",
+    submit: "Send request",
+  },
+}
 
-const budgetRanges = [
-  "Menos de $2,000",
-  "$2,000 - $5,000",
-  "$5,000 - $15,000",
-  "$15,000 - $50,000",
-  "$50,000 +",
-  "Por definir",
-]
-
-const timelines = [
-  "Urgente (menos de 1 mes)",
-  "1 - 3 meses",
-  "3 - 6 meses",
-  "Más de 6 meses",
-  "Flexible",
-]
+const serviceIcons = [Globe, Smartphone, LayoutDashboard, Cloud, Bot, Wrench]
+const perkIcons = [Clock, FileText, CheckCircle2]
 
 export default function QuoteSection() {
+  const { lang } = useLanguage()
+  const t = copy[lang]
   const [selectedServices, setSelectedServices] = useState<string[]>([])
 
   const toggleService = (id: string) => {
@@ -54,24 +157,6 @@ export default function QuoteSection() {
     )
   }
 
-  const perks = [
-    {
-      icon: Clock,
-      title: "Respuesta en 24h hábiles",
-      description: "Revisamos tu caso y te devolvemos una propuesta inicial en el próximo día laboral.",
-    },
-    {
-      icon: FileText,
-      title: "Propuesta detallada por escrito",
-      description: "Alcance, entregables, tiempos, equipo asignado y presupuesto — todo documentado.",
-    },
-    {
-      icon: CheckCircle2,
-      title: "Sin compromiso",
-      description: "La cotización es gratuita. Si no seguimos adelante, no hay costos ocultos.",
-    },
-  ]
-
   return (
     <section id="cotizacion" className="py-20 bg-gradient-to-br from-background via-muted/20 to-primary/5">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -79,30 +164,30 @@ export default function QuoteSection() {
           <div className="text-center mb-16 max-w-3xl mx-auto">
             <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
               <Calculator className="h-3 w-3 mr-1" />
-              Cotización personalizada
+              {t.badge}
             </Badge>
             <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4 text-balance">
-              Cuéntanos tu proyecto y te <span className="text-primary">preparamos una propuesta</span>
+              {t.title} <span className="text-primary">{t.titleHighlight}</span>
             </h2>
-            <p className="text-lg text-muted-foreground text-pretty">
-              Llena el formulario con los detalles de lo que necesitas. Mientras más claro seas sobre el alcance, más
-              precisa será nuestra estimación.
-            </p>
+            <p className="text-lg text-muted-foreground text-pretty">{t.intro}</p>
           </div>
 
           {/* Perks */}
           <div className="grid md:grid-cols-3 gap-4 mb-12">
-            {perks.map((p, i) => (
-              <Card key={i} className="bg-card border-border">
-                <CardContent className="p-6">
-                  <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center mb-3">
-                    <p.icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-card-foreground mb-1">{p.title}</h3>
-                  <p className="text-sm text-muted-foreground">{p.description}</p>
-                </CardContent>
-              </Card>
-            ))}
+            {t.perks.map((p, i) => {
+              const Icon = perkIcons[i]
+              return (
+                <Card key={i} className="bg-card border-border">
+                  <CardContent className="p-6">
+                    <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center mb-3">
+                      <Icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <h3 className="font-semibold text-card-foreground mb-1">{p.title}</h3>
+                    <p className="text-sm text-muted-foreground">{p.description}</p>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
 
           {/* Quote form */}
@@ -115,13 +200,12 @@ export default function QuoteSection() {
                     <div className="h-7 w-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
                       1
                     </div>
-                    <h3 className="text-lg font-semibold text-card-foreground">
-                      ¿Qué tipo de proyecto necesitas?
-                    </h3>
-                    <span className="text-xs text-muted-foreground">(puedes seleccionar varios)</span>
+                    <h3 className="text-lg font-semibold text-card-foreground">{t.step1Title}</h3>
+                    <span className="text-xs text-muted-foreground">{t.step1Hint}</span>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {serviceTypes.map((service) => {
+                    {t.services.map((service, i) => {
+                      const Icon = serviceIcons[i]
                       const isActive = selectedServices.includes(service.id)
                       return (
                         <button
@@ -134,7 +218,7 @@ export default function QuoteSection() {
                               : "bg-background border-border hover:border-primary/50 text-muted-foreground hover:text-foreground"
                           }`}
                         >
-                          <service.icon className="h-5 w-5 flex-shrink-0" />
+                          <Icon className="h-5 w-5 flex-shrink-0" />
                           <span className="text-sm font-medium text-left">{service.label}</span>
                           {isActive && (
                             <CheckCircle2 className="h-4 w-4 ml-auto text-primary flex-shrink-0" />
@@ -151,16 +235,16 @@ export default function QuoteSection() {
                     <div className="h-7 w-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
                       2
                     </div>
-                    <h3 className="text-lg font-semibold text-card-foreground">Describe tu proyecto</h3>
+                    <h3 className="text-lg font-semibold text-card-foreground">{t.step2Title}</h3>
                   </div>
                   <div className="space-y-4">
                     <input
                       type="text"
-                      placeholder="Nombre del proyecto o producto"
+                      placeholder={t.projectName}
                       className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
                     />
                     <textarea
-                      placeholder="Objetivos, usuarios, funcionalidades clave, integraciones necesarias, diseño existente o inspiración..."
+                      placeholder={t.projectDesc}
                       rows={5}
                       className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground resize-none transition-all duration-300"
                     />
@@ -168,10 +252,10 @@ export default function QuoteSection() {
                       <div className="relative">
                         <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                         <select className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300 appearance-none">
-                          <option value="">Plazo estimado</option>
-                          {timelines.map((t) => (
-                            <option key={t} value={t}>
-                              {t}
+                          <option value="">{t.timelinePlaceholder}</option>
+                          {t.timelines.map((time) => (
+                            <option key={time} value={time}>
+                              {time}
                             </option>
                           ))}
                         </select>
@@ -179,8 +263,8 @@ export default function QuoteSection() {
                       <div className="relative">
                         <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                         <select className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300 appearance-none">
-                          <option value="">Presupuesto disponible (USD)</option>
-                          {budgetRanges.map((b) => (
+                          <option value="">{t.budgetPlaceholder}</option>
+                          {t.budgetRanges.map((b) => (
                             <option key={b} value={b}>
                               {b}
                             </option>
@@ -197,42 +281,39 @@ export default function QuoteSection() {
                     <div className="h-7 w-7 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
                       3
                     </div>
-                    <h3 className="text-lg font-semibold text-card-foreground">¿Cómo te contactamos?</h3>
+                    <h3 className="text-lg font-semibold text-card-foreground">{t.step3Title}</h3>
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
                     <input
                       type="text"
-                      placeholder="Nombre completo"
+                      placeholder={t.fullName}
                       className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
                     />
                     <input
                       type="text"
-                      placeholder="Empresa (opcional)"
+                      placeholder={t.company}
                       className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
                     />
                     <input
                       type="email"
-                      placeholder="Email de contacto"
+                      placeholder={t.email}
                       className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
                     />
                     <input
                       type="tel"
-                      placeholder="Teléfono o WhatsApp"
+                      placeholder={t.phone}
                       className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
                     />
                   </div>
                 </div>
 
                 <div className="pt-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <p className="text-xs text-muted-foreground text-center sm:text-left">
-                    Al enviar, aceptas que nos pongamos en contacto contigo para discutir tu proyecto. Tu información
-                    no será compartida con terceros.
-                  </p>
+                  <p className="text-xs text-muted-foreground text-center sm:text-left">{t.consent}</p>
                   <Button
                     size="lg"
                     className="bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto transition-all duration-300 hover:scale-105 hover:shadow-xl group whitespace-nowrap"
                   >
-                    Enviar solicitud
+                    {t.submit}
                     <Send className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </Button>
                 </div>
