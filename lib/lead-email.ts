@@ -1,4 +1,4 @@
-const RESEND_ENDPOINT = "https://api.resend.com/emails"
+import { resend } from "@/lib/resend"
 
 type SendLeadEmailInput = {
     subject: string
@@ -8,32 +8,23 @@ type SendLeadEmailInput = {
 }
 
 export const sendLeadEmail = async ({ subject, text, html, replyTo }: SendLeadEmailInput) => {
-    const apiKey = process.env.RESEND_API_KEY
     const from = process.env.LEADS_FROM_EMAIL
     const to = process.env.LEADS_TO_EMAIL || "soluciones@avilasystem.com"
 
-    if (!apiKey || !from) {
+    if (!resend || !from) {
         return { ok: false as const, reason: "email_not_configured" }
     }
 
-    const response = await fetch(RESEND_ENDPOINT, {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            from,
-            to,
-            subject,
-            text,
-            html,
-            reply_to: replyTo || to,
-        }),
-        cache: "no-store",
+    const { error } = await resend.emails.send({
+        from,
+        to,
+        subject,
+        text,
+        html,
+        replyTo: replyTo || to,
     })
 
-    if (!response.ok) {
+    if (error) {
         return { ok: false as const, reason: "email_provider_error" }
     }
 
