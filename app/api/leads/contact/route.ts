@@ -49,9 +49,16 @@ export async function POST(request: Request) {
             return NextResponse.json({ ok: false, message: "Revisa los campos del formulario." }, { status: 400 })
         }
 
-        const captcha = await verifyTurnstileToken(parsed.data.captchaToken, ip)
+        const captcha = await verifyTurnstileToken(parsed.data.captchaToken, ip, {
+            expectedAction: "contact",
+            expectedHostname: process.env.TURNSTILE_EXPECTED_HOSTNAME,
+        })
         if (!captcha.ok) {
-            return NextResponse.json({ ok: false, message: "No se pudo validar el captcha." }, { status: 400 })
+            const captchaMessage =
+                captcha.reason === "captcha_timeout"
+                    ? "El captcha expiro. Completalo nuevamente e intenta de nuevo."
+                    : "No se pudo validar el captcha."
+            return NextResponse.json({ ok: false, message: captchaMessage }, { status: 400 })
         }
 
         const { fullName, company, email, phone, projectType, budget, industry, projectDescription, contactPreferences } = parsed.data

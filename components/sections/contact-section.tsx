@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEvent, useMemo, useState } from "react"
+import { FormEvent, useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Mail, Phone, MapPin, Rocket, Clock, Users, Award, MessageCircle } from "lucide-react"
 import { useLanguage } from "@/components/providers/language-provider"
@@ -140,6 +140,12 @@ export default function ContactSection() {
     message: "",
   })
   const [captchaToken, setCaptchaToken] = useState("")
+  const [captchaResetTrigger, setCaptchaResetTrigger] = useState(0)
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const statusClassName = useMemo(() => {
     if (status.type === "success") {
@@ -163,6 +169,7 @@ export default function ContactSection() {
 
     setIsSubmitting(true)
     setStatus({ type: "idle", message: "" })
+    setCaptchaResetTrigger((value) => value + 1)
 
     const form = event.currentTarget
     const formData = new FormData(form)
@@ -188,8 +195,11 @@ export default function ContactSection() {
         body: JSON.stringify(payload),
       })
 
+      const result = (await response.json().catch(() => null)) as { message?: string } | null
+
       if (!response.ok) {
-        setStatus({ type: "error", message: t.errorMessage })
+        setStatus({ type: "error", message: result?.message || t.errorMessage })
+        setCaptchaToken("")
         return
       }
 
@@ -366,9 +376,11 @@ export default function ContactSection() {
                     aria-hidden="true"
                   />
 
-                  {siteKey ? (
+                  {!isMounted ? null : siteKey ? (
                     <TurnstileWidget
                       siteKey={siteKey}
+                      action="contact"
+                      resetTrigger={captchaResetTrigger}
                       onSuccess={(token) => setCaptchaToken(token)}
                       onExpire={() => setCaptchaToken("")}
                       onError={() => setCaptchaToken("")}
@@ -381,7 +393,7 @@ export default function ContactSection() {
 
                   <Button
                     type="submit"
-                    disabled={isSubmitting || !siteKey}
+                    disabled={isSubmitting || !siteKey || !isMounted}
                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group"
                   >
                     {isSubmitting ? t.sending : t.submit}

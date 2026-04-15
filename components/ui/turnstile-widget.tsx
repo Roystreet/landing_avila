@@ -13,8 +13,11 @@ declare global {
                     "expired-callback"?: () => void
                     "error-callback"?: () => void
                     theme?: "light" | "dark" | "auto"
+                    action?: string
+                    cData?: string
                 }
             ) => string
+            reset: (widgetId: string) => void
             remove: (widgetId: string) => void
         }
     }
@@ -26,6 +29,9 @@ type TurnstileWidgetProps = {
     onSuccess: (token: string) => void
     onExpire?: () => void
     onError?: () => void
+    action?: string
+    cData?: string
+    resetTrigger?: number
 }
 
 const SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
@@ -63,7 +69,16 @@ const ensureScript = () => {
     return scriptPromise
 }
 
-export default function TurnstileWidget({ siteKey, theme = "light", onSuccess, onExpire, onError }: TurnstileWidgetProps) {
+export default function TurnstileWidget({
+    siteKey,
+    theme = "light",
+    onSuccess,
+    onExpire,
+    onError,
+    action,
+    cData,
+    resetTrigger,
+}: TurnstileWidgetProps) {
     const containerRef = useRef<HTMLDivElement>(null)
     const widgetIdRef = useRef<string | null>(null)
 
@@ -87,6 +102,8 @@ export default function TurnstileWidget({ siteKey, theme = "light", onSuccess, o
                     "expired-callback": onExpire,
                     "error-callback": onError,
                     theme,
+                    action,
+                    cData,
                 })
             } catch {
                 onError?.()
@@ -101,7 +118,13 @@ export default function TurnstileWidget({ siteKey, theme = "light", onSuccess, o
                 window.turnstile.remove(widgetIdRef.current)
             }
         }
-    }, [onError, onExpire, onSuccess, siteKey, theme])
+    }, [action, cData, onError, onExpire, onSuccess, siteKey, theme])
+
+    useEffect(() => {
+        if (widgetIdRef.current && window.turnstile && resetTrigger !== undefined) {
+            window.turnstile.reset(widgetIdRef.current)
+        }
+    }, [resetTrigger])
 
     return <div ref={containerRef} />
 }

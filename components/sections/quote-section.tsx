@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEvent, useMemo, useState } from "react"
+import { FormEvent, useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
@@ -166,6 +166,12 @@ export default function QuoteSection() {
     message: "",
   })
   const [captchaToken, setCaptchaToken] = useState("")
+  const [captchaResetTrigger, setCaptchaResetTrigger] = useState(0)
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const statusClassName = useMemo(() => {
     if (status.type === "success") {
@@ -195,6 +201,7 @@ export default function QuoteSection() {
 
     setIsSubmitting(true)
     setStatus({ type: "idle", message: "" })
+    setCaptchaResetTrigger((value) => value + 1)
 
     const form = event.currentTarget
     const formData = new FormData(form)
@@ -220,8 +227,11 @@ export default function QuoteSection() {
         body: JSON.stringify(payload),
       })
 
+      const result = (await response.json().catch(() => null)) as { message?: string } | null
+
       if (!response.ok) {
-        setStatus({ type: "error", message: t.errorMessage })
+        setStatus({ type: "error", message: result?.message || t.errorMessage })
+        setCaptchaToken("")
         return
       }
 
@@ -292,8 +302,8 @@ export default function QuoteSection() {
                           type="button"
                           onClick={() => toggleService(service.id)}
                           className={`flex items-center gap-3 p-4 rounded-lg border transition-all duration-300 ${isActive
-                              ? "bg-primary/10 border-primary text-primary shadow-md shadow-primary/10"
-                              : "bg-background border-border hover:border-primary/50 text-muted-foreground hover:text-foreground"
+                            ? "bg-primary/10 border-primary text-primary shadow-md shadow-primary/10"
+                            : "bg-background border-border hover:border-primary/50 text-muted-foreground hover:text-foreground"
                             }`}
                         >
                           <Icon className="h-5 w-5 flex-shrink-0" />
@@ -413,9 +423,11 @@ export default function QuoteSection() {
                   aria-hidden="true"
                 />
 
-                {siteKey ? (
+                {!isMounted ? null : siteKey ? (
                   <TurnstileWidget
                     siteKey={siteKey}
+                    action="quote"
+                    resetTrigger={captchaResetTrigger}
                     onSuccess={(token) => setCaptchaToken(token)}
                     onExpire={() => setCaptchaToken("")}
                     onError={() => setCaptchaToken("")}
@@ -431,7 +443,7 @@ export default function QuoteSection() {
                   <Button
                     type="submit"
                     size="lg"
-                    disabled={isSubmitting || !siteKey}
+                    disabled={isSubmitting || !siteKey || !isMounted}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto transition-all duration-300 hover:scale-105 hover:shadow-xl group whitespace-nowrap"
                   >
                     {isSubmitting ? t.sending : t.submit}

@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        <Script src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsId}`} strategy="afterInteractive" />
+        <Script src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsId}`} strategy="lazyOnload" />
         <Script id="google-ads-gtag" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
