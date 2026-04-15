@@ -25,6 +25,7 @@ export const sendLeadEmail = async ({ subject, text, html, replyTo }: SendLeadEm
     })
 
     if (error) {
+        console.error("Error sending lead email:", error)
         return { ok: false as const, reason: "email_provider_error" }
     }
 

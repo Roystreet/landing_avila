@@ -1,10 +1,9 @@
 "use client"
 
-import { FormEvent, useEffect, useMemo, useState } from "react"
+import { FormEvent, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Mail, Phone, MapPin, Rocket, Clock, Users, Award, MessageCircle } from "lucide-react"
 import { useLanguage } from "@/components/providers/language-provider"
-import TurnstileWidget from "@/components/ui/turnstile-widget"
 
 const WHATSAPP_DISPLAY = "+58 416 602 24 78"
 
@@ -58,9 +57,19 @@ const copy = {
     contactChannels: ["Email", "WhatsApp", "Llamada telefónica", "Reunión virtual"],
     submit: "Enviar mensaje",
     sending: "Enviando...",
-    successMessage: "Mensaje enviado. Te responderemos pronto.",
+    successMessage: "Mensaje enviado con exito. Te responderemos pronto.",
     errorMessage: "No pudimos enviar tu mensaje. Verifica los datos e intenta de nuevo.",
-    captchaMessage: "Completa el captcha para continuar.",
+    missingFieldsIntro: "Completa estos campos para continuar:",
+    projectDescriptionTooShort: "Describe mejor tu proyecto. Necesitamos al menos 10 caracteres.",
+    fieldLabels: {
+      fullName: "Nombre completo",
+      email: "Email",
+      phone: "Telefono",
+      projectType: "Tipo de proyecto",
+      budget: "Presupuesto estimado",
+      projectDescription: "Descripcion del proyecto",
+      contactPreferences: "Canal de contacto",
+    },
     extra: [
       { title: "Respuesta en 24h", desc: "Te contactamos dentro de las próximas 24 horas hábiles" },
       { title: "Equipo dedicado", desc: "Un equipo asignado exclusivamente a tu proyecto" },
@@ -116,9 +125,19 @@ const copy = {
     contactChannels: ["Email", "WhatsApp", "Phone call", "Virtual meeting"],
     submit: "Send message",
     sending: "Sending...",
-    successMessage: "Message sent. We will get back to you soon.",
+    successMessage: "Message sent successfully. We will get back to you soon.",
     errorMessage: "We could not send your message. Please review your data and try again.",
-    captchaMessage: "Please complete the captcha to continue.",
+    missingFieldsIntro: "Please complete these fields to continue:",
+    projectDescriptionTooShort: "Please add more detail about your project. We need at least 10 characters.",
+    fieldLabels: {
+      fullName: "Full name",
+      email: "Email",
+      phone: "Phone",
+      projectType: "Project type",
+      budget: "Estimated budget",
+      projectDescription: "Project description",
+      contactPreferences: "Contact channel",
+    },
     extra: [
       { title: "24h reply", desc: "We'll reach out within the next 24 business hours" },
       { title: "Dedicated team", desc: "A team assigned exclusively to your project" },
@@ -129,31 +148,24 @@ const copy = {
 
 const contactIcons = [Mail, MessageCircle, MapPin]
 const extraIcons = [MessageCircle, Users, Award]
+const PROJECT_DESCRIPTION_MIN_LENGTH = 10
 
 export default function ContactSection() {
   const { lang } = useLanguage()
   const t = copy[lang]
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [status, setStatus] = useState<{ type: "idle" | "success" | "error"; message: string }>({
     type: "idle",
     message: "",
   })
-  const [captchaToken, setCaptchaToken] = useState("")
-  const [captchaResetTrigger, setCaptchaResetTrigger] = useState(0)
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
 
   const statusClassName = useMemo(() => {
     if (status.type === "success") {
-      return "text-green-600"
+      return "text-green-700 bg-green-50 border border-green-200"
     }
 
     if (status.type === "error") {
-      return "text-red-600"
+      return "text-red-700 bg-red-50 border border-red-200"
     }
 
     return ""
@@ -161,15 +173,6 @@ export default function ContactSection() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-
-    if (!captchaToken) {
-      setStatus({ type: "error", message: t.captchaMessage })
-      return
-    }
-
-    setIsSubmitting(true)
-    setStatus({ type: "idle", message: "" })
-    setCaptchaResetTrigger((value) => value + 1)
 
     const form = event.currentTarget
     const formData = new FormData(form)
@@ -184,9 +187,32 @@ export default function ContactSection() {
       industry: String(formData.get("industry") || ""),
       projectDescription: String(formData.get("projectDescription") || ""),
       contactPreferences: formData.getAll("contactPreferences").map(String),
-      captchaToken,
       hp: String(formData.get("hp") || ""),
     }
+
+    const missingFields: Array<keyof typeof t.fieldLabels> = []
+
+    if (!payload.fullName.trim()) missingFields.push("fullName")
+    if (!payload.email.trim()) missingFields.push("email")
+    if (!payload.phone.trim()) missingFields.push("phone")
+    if (!payload.projectType.trim()) missingFields.push("projectType")
+    if (!payload.budget.trim()) missingFields.push("budget")
+    if (!payload.projectDescription.trim()) missingFields.push("projectDescription")
+    if (payload.contactPreferences.length === 0) missingFields.push("contactPreferences")
+
+    if (missingFields.length > 0) {
+      const fieldsText = missingFields.map((field) => t.fieldLabels[field]).join(", ")
+      setStatus({ type: "error", message: `${t.missingFieldsIntro} ${fieldsText}.` })
+      return
+    }
+
+    if (payload.projectDescription.trim().length < PROJECT_DESCRIPTION_MIN_LENGTH) {
+      setStatus({ type: "error", message: t.projectDescriptionTooShort })
+      return
+    }
+
+    setIsSubmitting(true)
+    setStatus({ type: "idle", message: "" })
 
     try {
       const response = await fetch("/api/leads/contact", {
@@ -195,17 +221,41 @@ export default function ContactSection() {
         body: JSON.stringify(payload),
       })
 
-      const result = (await response.json().catch(() => null)) as { message?: string } | null
+      const result = (await response.json().catch(() => null)) as {
+        message?: string
+        missingFields?: string[]
+        fieldErrors?: Record<string, string[] | undefined>
+      } | null
 
       if (!response.ok) {
+        if (result?.missingFields?.length) {
+          const fieldsText = result.missingFields
+            .map((field) => t.fieldLabels[field as keyof typeof t.fieldLabels] || field)
+            .join(", ")
+          setStatus({ type: "error", message: `${t.missingFieldsIntro} ${fieldsText}.` })
+          return
+        }
+
+        const projectDescriptionError = result?.fieldErrors?.projectDescription?.[0]
+
+        if (projectDescriptionError) {
+          setStatus({ type: "error", message: projectDescriptionError })
+          return
+        }
+
+        const firstFieldError = Object.values(result?.fieldErrors || {}).flat().find(Boolean)
+
+        if (firstFieldError) {
+          setStatus({ type: "error", message: firstFieldError })
+          return
+        }
+
         setStatus({ type: "error", message: result?.message || t.errorMessage })
-        setCaptchaToken("")
         return
       }
 
       form.reset()
-      setCaptchaToken("")
-      setStatus({ type: "success", message: t.successMessage })
+      setStatus({ type: "success", message: result?.message || t.successMessage })
     } catch {
       setStatus({ type: "error", message: t.errorMessage })
     } finally {
@@ -214,7 +264,7 @@ export default function ContactSection() {
   }
 
   return (
-    <section id="contacto" className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
+    <section id="contacto" className="py-20 bg-linear-to-br from-primary/5 to-accent/5">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -346,6 +396,7 @@ export default function ContactSection() {
                     name="projectDescription"
                     placeholder={t.projectDesc}
                     rows={5}
+                    minLength={PROJECT_DESCRIPTION_MIN_LENGTH}
                     required
                     className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground resize-none transition-all duration-300 hover:border-primary/50"
                   />
@@ -376,24 +427,11 @@ export default function ContactSection() {
                     aria-hidden="true"
                   />
 
-                  {!isMounted ? null : siteKey ? (
-                    <TurnstileWidget
-                      siteKey={siteKey}
-                      action="contact"
-                      resetTrigger={captchaResetTrigger}
-                      onSuccess={(token) => setCaptchaToken(token)}
-                      onExpire={() => setCaptchaToken("")}
-                      onError={() => setCaptchaToken("")}
-                    />
-                  ) : (
-                    <p className="text-sm text-red-600">Captcha no configurado. Falta NEXT_PUBLIC_TURNSTILE_SITE_KEY.</p>
-                  )}
-
-                  {status.message ? <p className={`text-sm ${statusClassName}`}>{status.message}</p> : null}
+                  {status.message ? <p className={`text-sm rounded-lg px-4 py-3 ${statusClassName}`}>{status.message}</p> : null}
 
                   <Button
                     type="submit"
-                    disabled={isSubmitting || !siteKey || !isMounted}
+                    disabled={isSubmitting}
                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group"
                   >
                     {isSubmitting ? t.sending : t.submit}

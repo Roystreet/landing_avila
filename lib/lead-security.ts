@@ -1,5 +1,3 @@
-import { randomUUID } from "crypto"
-
 type RateBucket = {
     count: number
     resetAt: number
@@ -36,64 +34,5 @@ export const assertRateLimit = (key: string) => {
 
     current.count += 1
     buckets.set(key, current)
-    return { ok: true as const }
-}
-
-type VerifyTurnstileOptions = {
-    expectedAction?: string
-    expectedHostname?: string
-}
-
-export const verifyTurnstileToken = async (token: string, ip?: string, options?: VerifyTurnstileOptions) => {
-    const secret = process.env.TURNSTILE_SECRET_KEY
-
-    if (!secret) {
-        return { ok: false as const, reason: "captcha_not_configured" }
-    }
-
-    const params = new URLSearchParams({
-        secret,
-        response: token,
-        idempotency_key: randomUUID(),
-    })
-
-    if (ip && ip !== "unknown") {
-        params.set("remoteip", ip)
-    }
-
-    const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: params,
-        cache: "no-store",
-    })
-
-    if (!response.ok) {
-        return { ok: false as const, reason: "captcha_unavailable" }
-    }
-
-    const json = (await response.json()) as {
-        success?: boolean
-        action?: string
-        hostname?: string
-        "error-codes"?: string[]
-    }
-
-    if (!json.success) {
-        const timeoutOrDuplicate = json["error-codes"]?.includes("timeout-or-duplicate")
-        return {
-            ok: false as const,
-            reason: timeoutOrDuplicate ? "captcha_timeout" : "captcha_invalid",
-        }
-    }
-
-    if (options?.expectedAction && json.action !== options.expectedAction) {
-        return { ok: false as const, reason: "captcha_action_mismatch" }
-    }
-
-    if (options?.expectedHostname && json.hostname !== options.expectedHostname) {
-        return { ok: false as const, reason: "captcha_hostname_mismatch" }
-    }
-
     return { ok: true as const }
 }

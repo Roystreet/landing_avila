@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
-import { quoteSchema } from "@/lib/lead-schemas"
-import { assertRateLimit, getClientIp, verifyTurnstileToken } from "@/lib/lead-security"
+import { getLeadValidationDetails, quoteSchema } from "@/lib/lead-schemas"
+import { assertRateLimit, getClientIp } from "@/lib/lead-security"
 import { escapeHtml, sendLeadEmail } from "@/lib/lead-email"
 
 const getString = (value: unknown) => (typeof value === "string" ? value : "")
@@ -29,8 +29,19 @@ export async function POST(request: Request) {
             return NextResponse.json({ ok: false, message: "Demasiadas solicitudes. Intenta de nuevo en unos minutos." }, { status: 429 })
         }
 
-        const body = (await request.json()) as Record<string, unknown>
+        let rawBody: unknown
 
+        try {
+            rawBody = await request.json()
+        } catch {
+            return NextResponse.json({ ok: false, message: "No se pudo procesar la solicitud. Recarga la pagina e intenta de nuevo." }, { status: 400 })
+        }
+
+        if (!rawBody || typeof rawBody !== "object" || Array.isArray(rawBody)) {
+            return NextResponse.json({ ok: false, message: "El formato del formulario es invalido." }, { status: 400 })
+        }
+
+        const body = rawBody as Record<string, unknown>
         const parsed = quoteSchema.safeParse({
             services: getArray(body.services),
             projectName: getString(body.projectName),
@@ -41,24 +52,21 @@ export async function POST(request: Request) {
             company: getString(body.company),
             email: getString(body.email),
             phone: getString(body.phone),
-            captchaToken: getString(body.captchaToken),
             hp: getString(body.hp),
         })
 
         if (!parsed.success) {
-            return NextResponse.json({ ok: false, message: "Revisa los campos del formulario." }, { status: 400 })
-        }
+            const { fieldErrors, missingFields } = getLeadValidationDetails(parsed.error)
 
-        const captcha = await verifyTurnstileToken(parsed.data.captchaToken, ip, {
-            expectedAction: "quote",
-            expectedHostname: process.env.TURNSTILE_EXPECTED_HOSTNAME,
-        })
-        if (!captcha.ok) {
-            const captchaMessage =
-                captcha.reason === "captcha_timeout"
-                    ? "El captcha expiro. Completalo nuevamente e intenta de nuevo."
-                    : "No se pudo validar el captcha."
-            return NextResponse.json({ ok: false, message: captchaMessage }, { status: 400 })
+            return NextResponse.json(
+                {
+                    ok: false,
+                    message: missingFields.length > 0 ? "Completa los campos obligatorios del formulario." : "Revisa la informacion ingresada en el formulario.",
+                    missingFields,
+                    fieldErrors,
+                },
+                { status: 400 }
+            )
         }
 
         const { services, projectName, projectDescription, timeline, budget, fullName, company, email, phone } = parsed.data
@@ -99,13 +107,11 @@ export async function POST(request: Request) {
             html,
             replyTo: email,
         })
+        console.log("Quote lead email sent:", sent)
 
-        if (!sent.ok) {
-            return NextResponse.json({ ok: false, message: "No se pudo enviar el correo. Intenta de nuevo." }, { status: 500 })
-        }
-
-        return NextResponse.json({ ok: true })
-    } catch {
+        return NextResponse.json({ ok: true, message: "Cotizacion enviada con exito. Te responderemos en menos de 24 horas habiles." })
+    } catch (error) {
+        console.error("Error processing quote lead", error)
         return NextResponse.json({ ok: false, message: "Ocurrio un error inesperado." }, { status: 500 })
     }
 }

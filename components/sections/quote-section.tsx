@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEvent, useEffect, useMemo, useState } from "react"
+import { FormEvent, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
@@ -19,7 +19,6 @@ import {
   Wrench,
 } from "lucide-react"
 import { useLanguage } from "@/components/providers/language-provider"
-import TurnstileWidget from "@/components/ui/turnstile-widget"
 
 const copy = {
   es: {
@@ -82,9 +81,20 @@ const copy = {
       "Al enviar, aceptas que nos pongamos en contacto contigo para discutir tu proyecto. Tu información no será compartida con terceros.",
     submit: "Enviar solicitud",
     sending: "Enviando...",
-    successMessage: "Solicitud enviada. Te responderemos con una propuesta inicial.",
+    successMessage: "Solicitud enviada con exito. Te responderemos con una propuesta inicial en menos de 24h habiles.",
     errorMessage: "No pudimos enviar la solicitud. Verifica los datos e intenta de nuevo.",
-    captchaMessage: "Completa el captcha para continuar.",
+    missingFieldsIntro: "Completa estos campos para continuar:",
+    projectDescriptionTooShort: "Describe mejor tu proyecto. Necesitamos al menos 10 caracteres.",
+    fieldLabels: {
+      services: "Tipo de proyecto",
+      projectName: "Nombre del proyecto",
+      projectDescription: "Descripcion del proyecto",
+      timeline: "Plazo estimado",
+      budget: "Presupuesto",
+      fullName: "Nombre completo",
+      email: "Email de contacto",
+      phone: "Telefono o WhatsApp",
+    },
   },
   en: {
     badge: "Custom quote",
@@ -146,40 +156,44 @@ const copy = {
       "By submitting, you agree that we may contact you to discuss your project. Your information will not be shared with third parties.",
     submit: "Send request",
     sending: "Sending...",
-    successMessage: "Request sent. We will reply with an initial proposal.",
+    successMessage: "Request sent successfully. We will reply with an initial proposal within 24 business hours.",
     errorMessage: "We could not send the request. Please review your data and try again.",
-    captchaMessage: "Please complete the captcha to continue.",
+    missingFieldsIntro: "Please complete these fields to continue:",
+    projectDescriptionTooShort: "Please add more detail about your project. We need at least 10 characters.",
+    fieldLabels: {
+      services: "Project type",
+      projectName: "Project name",
+      projectDescription: "Project description",
+      timeline: "Estimated timeline",
+      budget: "Budget",
+      fullName: "Full name",
+      email: "Contact email",
+      phone: "Phone or WhatsApp",
+    },
   },
 }
 
 const serviceIcons = [Globe, Smartphone, LayoutDashboard, Cloud, Bot, Wrench]
 const perkIcons = [Clock, FileText, CheckCircle2]
+const PROJECT_DESCRIPTION_MIN_LENGTH = 10
 
 export default function QuoteSection() {
   const { lang } = useLanguage()
   const t = copy[lang]
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""
   const [selectedServices, setSelectedServices] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [status, setStatus] = useState<{ type: "idle" | "success" | "error"; message: string }>({
     type: "idle",
     message: "",
   })
-  const [captchaToken, setCaptchaToken] = useState("")
-  const [captchaResetTrigger, setCaptchaResetTrigger] = useState(0)
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
 
   const statusClassName = useMemo(() => {
     if (status.type === "success") {
-      return "text-green-600"
+      return "text-green-700 bg-green-50 border border-green-200"
     }
 
     if (status.type === "error") {
-      return "text-red-600"
+      return "text-red-700 bg-red-50 border border-red-200"
     }
 
     return ""
@@ -194,15 +208,6 @@ export default function QuoteSection() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (!captchaToken) {
-      setStatus({ type: "error", message: t.captchaMessage })
-      return
-    }
-
-    setIsSubmitting(true)
-    setStatus({ type: "idle", message: "" })
-    setCaptchaResetTrigger((value) => value + 1)
-
     const form = event.currentTarget
     const formData = new FormData(form)
 
@@ -216,9 +221,33 @@ export default function QuoteSection() {
       company: String(formData.get("company") || ""),
       email: String(formData.get("email") || ""),
       phone: String(formData.get("phone") || ""),
-      captchaToken,
       hp: String(formData.get("hp") || ""),
     }
+
+    const missingFields: Array<keyof typeof t.fieldLabels> = []
+
+    if (payload.services.length === 0) missingFields.push("services")
+    if (!payload.projectName.trim()) missingFields.push("projectName")
+    if (!payload.projectDescription.trim()) missingFields.push("projectDescription")
+    if (!payload.timeline.trim()) missingFields.push("timeline")
+    if (!payload.budget.trim()) missingFields.push("budget")
+    if (!payload.fullName.trim()) missingFields.push("fullName")
+    if (!payload.email.trim()) missingFields.push("email")
+    if (!payload.phone.trim()) missingFields.push("phone")
+
+    if (missingFields.length > 0) {
+      const fieldsText = missingFields.map((field) => t.fieldLabels[field]).join(", ")
+      setStatus({ type: "error", message: `${t.missingFieldsIntro} ${fieldsText}.` })
+      return
+    }
+
+    if (payload.projectDescription.trim().length < PROJECT_DESCRIPTION_MIN_LENGTH) {
+      setStatus({ type: "error", message: t.projectDescriptionTooShort })
+      return
+    }
+
+    setIsSubmitting(true)
+    setStatus({ type: "idle", message: "" })
 
     try {
       const response = await fetch("/api/leads/quote", {
@@ -227,18 +256,42 @@ export default function QuoteSection() {
         body: JSON.stringify(payload),
       })
 
-      const result = (await response.json().catch(() => null)) as { message?: string } | null
+      const result = (await response.json().catch(() => null)) as {
+        message?: string
+        missingFields?: string[]
+        fieldErrors?: Record<string, string[] | undefined>
+      } | null
 
       if (!response.ok) {
+        if (result?.missingFields?.length) {
+          const fieldsText = result.missingFields
+            .map((field) => t.fieldLabels[field as keyof typeof t.fieldLabels] || field)
+            .join(", ")
+          setStatus({ type: "error", message: `${t.missingFieldsIntro} ${fieldsText}.` })
+          return
+        }
+
+        const projectDescriptionError = result?.fieldErrors?.projectDescription?.[0]
+
+        if (projectDescriptionError) {
+          setStatus({ type: "error", message: projectDescriptionError })
+          return
+        }
+
+        const firstFieldError = Object.values(result?.fieldErrors || {}).flat().find(Boolean)
+
+        if (firstFieldError) {
+          setStatus({ type: "error", message: firstFieldError })
+          return
+        }
+
         setStatus({ type: "error", message: result?.message || t.errorMessage })
-        setCaptchaToken("")
         return
       }
 
       form.reset()
       setSelectedServices([])
-      setCaptchaToken("")
-      setStatus({ type: "success", message: t.successMessage })
+      setStatus({ type: "success", message: result?.message || t.successMessage })
     } catch {
       setStatus({ type: "error", message: t.errorMessage })
     } finally {
@@ -247,7 +300,7 @@ export default function QuoteSection() {
   }
 
   return (
-    <section id="cotizacion" className="py-20 bg-gradient-to-br from-background via-muted/20 to-primary/5">
+    <section id="cotizacion" className="py-20 bg-linear-to-br from-background via-muted/20 to-primary/5">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16 max-w-3xl mx-auto">
@@ -306,10 +359,10 @@ export default function QuoteSection() {
                             : "bg-background border-border hover:border-primary/50 text-muted-foreground hover:text-foreground"
                             }`}
                         >
-                          <Icon className="h-5 w-5 flex-shrink-0" />
+                          <Icon className="h-5 w-5 shrink-0" />
                           <span className="text-sm font-medium text-left">{service.label}</span>
                           {isActive && (
-                            <CheckCircle2 className="h-4 w-4 ml-auto text-primary flex-shrink-0" />
+                            <CheckCircle2 className="h-4 w-4 ml-auto text-primary shrink-0" />
                           )}
                         </button>
                       )
@@ -337,6 +390,7 @@ export default function QuoteSection() {
                       name="projectDescription"
                       placeholder={t.projectDesc}
                       rows={5}
+                      minLength={PROJECT_DESCRIPTION_MIN_LENGTH}
                       required
                       className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground resize-none transition-all duration-300"
                     />
@@ -423,27 +477,14 @@ export default function QuoteSection() {
                   aria-hidden="true"
                 />
 
-                {!isMounted ? null : siteKey ? (
-                  <TurnstileWidget
-                    siteKey={siteKey}
-                    action="quote"
-                    resetTrigger={captchaResetTrigger}
-                    onSuccess={(token) => setCaptchaToken(token)}
-                    onExpire={() => setCaptchaToken("")}
-                    onError={() => setCaptchaToken("")}
-                  />
-                ) : (
-                  <p className="text-sm text-red-600">Captcha no configurado. Falta NEXT_PUBLIC_TURNSTILE_SITE_KEY.</p>
-                )}
-
-                {status.message ? <p className={`text-sm ${statusClassName}`}>{status.message}</p> : null}
+                {status.message ? <p className={`text-sm rounded-lg px-4 py-3 ${statusClassName}`}>{status.message}</p> : null}
 
                 <div className="pt-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
                   <p className="text-xs text-muted-foreground text-center sm:text-left">{t.consent}</p>
                   <Button
                     type="submit"
                     size="lg"
-                    disabled={isSubmitting || !siteKey || !isMounted}
+                    disabled={isSubmitting}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto transition-all duration-300 hover:scale-105 hover:shadow-xl group whitespace-nowrap"
                   >
                     {isSubmitting ? t.sending : t.submit}
