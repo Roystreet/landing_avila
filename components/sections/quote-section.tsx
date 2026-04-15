@@ -19,6 +19,14 @@ import {
   Wrench,
 } from "lucide-react"
 import { useLanguage } from "@/components/providers/language-provider"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { cn } from "@/lib/utils"
 
 const copy = {
   es: {
@@ -181,6 +189,8 @@ export default function QuoteSection() {
   const { lang } = useLanguage()
   const t = copy[lang]
   const [selectedServices, setSelectedServices] = useState<string[]>([])
+  const [timelineValue, setTimelineValue] = useState("")
+  const [budgetValue, setBudgetValue] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [status, setStatus] = useState<{ type: "idle" | "success" | "error"; message: string }>({
     type: "idle",
@@ -291,6 +301,8 @@ export default function QuoteSection() {
 
       form.reset()
       setSelectedServices([])
+      setTimelineValue("")
+      setBudgetValue("")
       setStatus({ type: "success", message: result?.message || t.successMessage })
     } catch {
       setStatus({ type: "error", message: t.errorMessage })
@@ -354,7 +366,7 @@ export default function QuoteSection() {
                           key={service.id}
                           type="button"
                           onClick={() => toggleService(service.id)}
-                          className={`flex items-center gap-3 p-4 rounded-lg border transition-all duration-300 ${isActive
+                          className={`flex cursor-pointer items-center gap-3 p-4 rounded-lg border transition-all duration-300 ${isActive
                             ? "bg-primary/10 border-primary text-primary shadow-md shadow-primary/10"
                             : "bg-background border-border hover:border-primary/50 text-muted-foreground hover:text-foreground"
                             }`}
@@ -395,35 +407,65 @@ export default function QuoteSection() {
                       className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground resize-none transition-all duration-300"
                     />
                     <div className="grid md:grid-cols-2 gap-4">
-                      <div className="relative">
-                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <select
-                          name="timeline"
-                          required
-                          className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300 appearance-none"
-                        >
-                          <option value="">{t.timelinePlaceholder}</option>
-                          {t.timelines.map((time) => (
-                            <option key={time} value={time}>
-                              {time}
-                            </option>
-                          ))}
-                        </select>
+                      <div className="relative rounded-2xl border border-border/70 bg-linear-to-br from-background via-background to-primary/5 p-px shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 focus-within:border-primary/60 focus-within:shadow-lg focus-within:shadow-primary/10">
+                        <div className="relative rounded-[calc(var(--radius-2xl)-1px)] bg-background/95 backdrop-blur">
+                          <div className="pointer-events-none absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl border border-primary/10 bg-primary/8 text-primary">
+                            <Clock className="h-4 w-4" />
+                          </div>
+                          <input type="hidden" name="timeline" value={timelineValue} />
+                          <Select value={timelineValue} onValueChange={setTimelineValue}>
+                            <SelectTrigger
+                              aria-label={t.timelinePlaceholder}
+                              className={cn(
+                                "h-auto w-full rounded-[calc(var(--radius-2xl)-1px)] border-0 bg-transparent py-4 pr-12 pl-16 text-left text-sm font-medium shadow-none ring-0 focus-visible:ring-0 focus-visible:ring-offset-0",
+                                timelineValue ? "text-foreground" : "text-muted-foreground"
+                              )}
+                            >
+                              <SelectValue placeholder={t.timelinePlaceholder} />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-2xl border-border/80 bg-popover/98 text-popover-foreground shadow-2xl shadow-primary/10 backdrop-blur-md">
+                              {t.timelines.map((time) => (
+                                <SelectItem
+                                  key={time}
+                                  value={time}
+                                  className="rounded-xl px-3 py-2 text-sm text-popover-foreground focus:bg-primary focus:text-primary-foreground data-[state=checked]:bg-primary/12 data-[state=checked]:text-foreground"
+                                >
+                                  {time}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
-                      <div className="relative">
-                        <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <select
-                          name="budget"
-                          required
-                          className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300 appearance-none"
-                        >
-                          <option value="">{t.budgetPlaceholder}</option>
-                          {t.budgetRanges.map((b) => (
-                            <option key={b} value={b}>
-                              {b}
-                            </option>
-                          ))}
-                        </select>
+                      <div className="relative rounded-2xl border border-border/70 bg-linear-to-br from-background via-background to-primary/5 p-px shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 focus-within:border-primary/60 focus-within:shadow-lg focus-within:shadow-primary/10">
+                        <div className="relative rounded-[calc(var(--radius-2xl)-1px)] bg-background/95 backdrop-blur">
+                          <div className="pointer-events-none absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl border border-primary/10 bg-primary/8 text-primary">
+                            <DollarSign className="h-4 w-4" />
+                          </div>
+                          <input type="hidden" name="budget" value={budgetValue} />
+                          <Select value={budgetValue} onValueChange={setBudgetValue}>
+                            <SelectTrigger
+                              aria-label={t.budgetPlaceholder}
+                              className={cn(
+                                "h-auto w-full rounded-[calc(var(--radius-2xl)-1px)] border-0 bg-transparent py-4 pr-12 pl-16 text-left text-sm font-medium shadow-none ring-0 focus-visible:ring-0 focus-visible:ring-offset-0",
+                                budgetValue ? "text-foreground" : "text-muted-foreground"
+                              )}
+                            >
+                              <SelectValue placeholder={t.budgetPlaceholder} />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-2xl border-border/80 bg-popover/98 text-popover-foreground shadow-2xl shadow-primary/10 backdrop-blur-md">
+                              {t.budgetRanges.map((b) => (
+                                <SelectItem
+                                  key={b}
+                                  value={b}
+                                  className="rounded-xl px-3 py-2 text-sm text-popover-foreground focus:bg-primary focus:text-primary-foreground data-[state=checked]:bg-primary/12 data-[state=checked]:text-foreground"
+                                >
+                                  {b}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -2,8 +2,16 @@
 
 import { FormEvent, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Mail, Phone, MapPin, Rocket, Clock, Users, Award, MessageCircle } from "lucide-react"
 import { useLanguage } from "@/components/providers/language-provider"
+import { cn } from "@/lib/utils"
 
 const WHATSAPP_DISPLAY = "+58 416 602 24 78"
 
@@ -153,6 +161,8 @@ const PROJECT_DESCRIPTION_MIN_LENGTH = 10
 export default function ContactSection() {
   const { lang } = useLanguage()
   const t = copy[lang]
+  const [projectTypeValue, setProjectTypeValue] = useState("")
+  const [budgetValue, setBudgetValue] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [status, setStatus] = useState<{ type: "idle" | "success" | "error"; message: string }>({
     type: "idle",
@@ -255,6 +265,8 @@ export default function ContactSection() {
       }
 
       form.reset()
+      setProjectTypeValue("")
+      setBudgetValue("")
       setStatus({ type: "success", message: result?.message || t.successMessage })
     } catch {
       setStatus({ type: "error", message: t.errorMessage })
@@ -355,36 +367,52 @@ export default function ContactSection() {
                     />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <select
-                      name="projectType"
-                      defaultValue=""
-                      required
-                      className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
-                    >
-                      <option value="" disabled>
-                        {t.projectType}
-                      </option>
-                      {t.projectTypes.map((p) => (
-                        <option key={p} value={p}>
-                          {p}
-                        </option>
-                      ))}
-                    </select>
-                    <select
-                      name="budget"
-                      defaultValue=""
-                      required
-                      className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
-                    >
-                      <option value="" disabled>
-                        {t.budgetLabel}
-                      </option>
-                      {t.budgets.map((b) => (
-                        <option key={b} value={b}>
-                          {b}
-                        </option>
-                      ))}
-                    </select>
+                    <Select value={projectTypeValue} onValueChange={setProjectTypeValue}>
+                      <input type="hidden" name="projectType" value={projectTypeValue} />
+                      <SelectTrigger
+                        aria-label={t.projectType}
+                        className={cn(
+                          "h-auto w-full rounded-lg border border-border bg-input px-4 py-3 text-left text-sm shadow-none transition-all duration-300 hover:border-primary/50 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring",
+                          projectTypeValue ? "text-foreground" : "text-muted-foreground"
+                        )}
+                      >
+                        <SelectValue placeholder={t.projectType} />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-border/80 bg-popover/98 text-popover-foreground shadow-xl shadow-primary/10 backdrop-blur-md">
+                        {t.projectTypes.map((projectType) => (
+                          <SelectItem
+                            key={projectType}
+                            value={projectType}
+                            className="rounded-lg px-3 py-2 text-sm text-popover-foreground focus:bg-primary focus:text-primary-foreground data-[state=checked]:bg-primary/12 data-[state=checked]:text-foreground"
+                          >
+                            {projectType}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={budgetValue} onValueChange={setBudgetValue}>
+                      <input type="hidden" name="budget" value={budgetValue} />
+                      <SelectTrigger
+                        aria-label={t.budgetLabel}
+                        className={cn(
+                          "h-auto w-full rounded-lg border border-border bg-input px-4 py-3 text-left text-sm shadow-none transition-all duration-300 hover:border-primary/50 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring",
+                          budgetValue ? "text-foreground" : "text-muted-foreground"
+                        )}
+                      >
+                        <SelectValue placeholder={t.budgetLabel} />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-border/80 bg-popover/98 text-popover-foreground shadow-xl shadow-primary/10 backdrop-blur-md">
+                        {t.budgets.map((budget) => (
+                          <SelectItem
+                            key={budget}
+                            value={budget}
+                            className="rounded-lg px-3 py-2 text-sm text-popover-foreground focus:bg-primary focus:text-primary-foreground data-[state=checked]:bg-primary/12 data-[state=checked]:text-foreground"
+                          >
+                            {budget}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <input
                     name="industry"
