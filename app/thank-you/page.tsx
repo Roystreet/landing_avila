@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { Suspense, useEffect } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import Footer from "@/components/layout/footer"
@@ -33,7 +33,7 @@ const copy = {
     },
 }
 
-export default function ThankYouPage() {
+function ThankYouContent() {
     const { lang } = useLanguage()
     const t = copy[lang]
     const searchParams = useSearchParams()
@@ -90,5 +90,13 @@ export default function ThankYouPage() {
             </section>
             <Footer />
         </div>
+    )
+}
+
+export default function ThankYouPage() {
+    return (
+        <Suspense fallback={null}>
+            <ThankYouContent />
+        </Suspense>
     )
 }
