@@ -7,6 +7,7 @@ import Header from "@/components/layout/header"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { LanguageProvider } from "@/components/providers/language-provider"
+import { adsConfig } from "@/lib/gtag"
 
 export const metadata: Metadata = {
   title: "Avila System - Consultora de Desarrollo de Software",
@@ -19,20 +20,25 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const googleAdsId = "AW-18090292927"
+  const googleAdsId = adsConfig.googleAdsId
 
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        <Script src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsId}`} strategy="lazyOnload" />
-        <Script id="google-ads-gtag" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${googleAdsId}');
-          `}
-        </Script>
+        {googleAdsId ? (
+          <>
+            <Script src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsId}`} strategy="lazyOnload" />
+            <Script id="google-ads-gtag" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                window.gtag = gtag;
+                gtag('js', new Date());
+                gtag('config', '${googleAdsId}');
+              `}
+            </Script>
+          </>
+        ) : null}
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
           <LanguageProvider>
             <Header />

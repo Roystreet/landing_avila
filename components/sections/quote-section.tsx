@@ -26,7 +26,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
 
 const copy = {
   es: {
@@ -85,8 +87,10 @@ const copy = {
     company: "Empresa (opcional)",
     email: "Email de contacto",
     phone: "Teléfono o WhatsApp",
-    consent:
-      "Al enviar, aceptas que nos pongamos en contacto contigo para discutir tu proyecto. Tu información no será compartida con terceros.",
+    consentPrefix:
+      "Al enviar, aceptas que nos pongamos en contacto contigo para discutir tu proyecto. Tu información no será compartida con terceros. Revisa nuestra",
+    privacyLabel: "Política de Privacidad",
+    termsLabel: "Términos y Condiciones",
     submit: "Enviar solicitud",
     sending: "Enviando...",
     successMessage: "Solicitud enviada con exito. Te responderemos con una propuesta inicial en menos de 24h habiles.",
@@ -160,8 +164,10 @@ const copy = {
     company: "Company (optional)",
     email: "Contact email",
     phone: "Phone or WhatsApp",
-    consent:
-      "By submitting, you agree that we may contact you to discuss your project. Your information will not be shared with third parties.",
+    consentPrefix:
+      "By submitting, you agree that we may contact you to discuss your project. Your information will not be shared with third parties. Review our",
+    privacyLabel: "Privacy Policy",
+    termsLabel: "Terms & Conditions",
     submit: "Send request",
     sending: "Sending...",
     successMessage: "Request sent successfully. We will reply with an initial proposal within 24 business hours.",
@@ -188,6 +194,7 @@ const PROJECT_DESCRIPTION_MIN_LENGTH = 10
 export default function QuoteSection() {
   const { lang } = useLanguage()
   const t = copy[lang]
+  const router = useRouter()
   const [selectedServices, setSelectedServices] = useState<string[]>([])
   const [timelineValue, setTimelineValue] = useState("")
   const [budgetValue, setBudgetValue] = useState("")
@@ -304,6 +311,7 @@ export default function QuoteSection() {
       setTimelineValue("")
       setBudgetValue("")
       setStatus({ type: "success", message: result?.message || t.successMessage })
+      router.push("/thank-you?lead=quote")
     } catch {
       setStatus({ type: "error", message: t.errorMessage })
     } finally {
@@ -391,30 +399,47 @@ export default function QuoteSection() {
                     <h3 className="text-lg font-semibold text-card-foreground">{t.step2Title}</h3>
                   </div>
                   <div className="space-y-4">
-                    <input
-                      name="projectName"
-                      type="text"
-                      placeholder={t.projectName}
-                      required
-                      className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
-                    />
-                    <textarea
-                      name="projectDescription"
-                      placeholder={t.projectDesc}
-                      rows={5}
-                      minLength={PROJECT_DESCRIPTION_MIN_LENGTH}
-                      required
-                      className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground resize-none transition-all duration-300"
-                    />
+                    <div className="space-y-2">
+                      <label htmlFor="quote-project-name" className="block text-sm font-medium text-card-foreground">
+                        {t.fieldLabels.projectName}
+                      </label>
+                      <input
+                        id="quote-project-name"
+                        name="projectName"
+                        type="text"
+                        placeholder={t.projectName}
+                        autoComplete="organization-title"
+                        required
+                        className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="quote-project-description" className="block text-sm font-medium text-card-foreground">
+                        {t.fieldLabels.projectDescription}
+                      </label>
+                      <textarea
+                        id="quote-project-description"
+                        name="projectDescription"
+                        placeholder={t.projectDesc}
+                        rows={5}
+                        minLength={PROJECT_DESCRIPTION_MIN_LENGTH}
+                        required
+                        className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground resize-none transition-all duration-300"
+                      />
+                    </div>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="relative rounded-2xl border border-border/70 bg-linear-to-br from-background via-background to-primary/5 p-px shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 focus-within:border-primary/60 focus-within:shadow-lg focus-within:shadow-primary/10">
                         <div className="relative rounded-[calc(var(--radius-2xl)-1px)] bg-background/95 backdrop-blur">
+                          <label htmlFor="quote-timeline" className="sr-only">
+                            {t.fieldLabels.timeline}
+                          </label>
                           <div className="pointer-events-none absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl border border-primary/10 bg-primary/8 text-primary">
                             <Clock className="h-4 w-4" />
                           </div>
                           <input type="hidden" name="timeline" value={timelineValue} />
                           <Select value={timelineValue} onValueChange={setTimelineValue}>
                             <SelectTrigger
+                              id="quote-timeline"
                               aria-label={t.timelinePlaceholder}
                               className={cn(
                                 "h-auto w-full rounded-[calc(var(--radius-2xl)-1px)] border-0 bg-transparent py-4 pr-12 pl-16 text-left text-sm font-medium shadow-none ring-0 focus-visible:ring-0 focus-visible:ring-offset-0",
@@ -439,12 +464,16 @@ export default function QuoteSection() {
                       </div>
                       <div className="relative rounded-2xl border border-border/70 bg-linear-to-br from-background via-background to-primary/5 p-px shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 focus-within:border-primary/60 focus-within:shadow-lg focus-within:shadow-primary/10">
                         <div className="relative rounded-[calc(var(--radius-2xl)-1px)] bg-background/95 backdrop-blur">
+                          <label htmlFor="quote-budget" className="sr-only">
+                            {t.fieldLabels.budget}
+                          </label>
                           <div className="pointer-events-none absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl border border-primary/10 bg-primary/8 text-primary">
                             <DollarSign className="h-4 w-4" />
                           </div>
                           <input type="hidden" name="budget" value={budgetValue} />
                           <Select value={budgetValue} onValueChange={setBudgetValue}>
                             <SelectTrigger
+                              id="quote-budget"
                               aria-label={t.budgetPlaceholder}
                               className={cn(
                                 "h-auto w-full rounded-[calc(var(--radius-2xl)-1px)] border-0 bg-transparent py-4 pr-12 pl-16 text-left text-sm font-medium shadow-none ring-0 focus-visible:ring-0 focus-visible:ring-offset-0",
@@ -480,33 +509,62 @@ export default function QuoteSection() {
                     <h3 className="text-lg font-semibold text-card-foreground">{t.step3Title}</h3>
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
-                    <input
-                      name="fullName"
-                      type="text"
-                      placeholder={t.fullName}
-                      required
-                      className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
-                    />
-                    <input
-                      name="company"
-                      type="text"
-                      placeholder={t.company}
-                      className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
-                    />
-                    <input
-                      name="email"
-                      type="email"
-                      placeholder={t.email}
-                      required
-                      className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
-                    />
-                    <input
-                      name="phone"
-                      type="tel"
-                      placeholder={t.phone}
-                      required
-                      className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
-                    />
+                    <div className="space-y-2">
+                      <label htmlFor="quote-full-name" className="block text-sm font-medium text-card-foreground">
+                        {t.fieldLabels.fullName}
+                      </label>
+                      <input
+                        id="quote-full-name"
+                        name="fullName"
+                        type="text"
+                        placeholder={t.fullName}
+                        autoComplete="name"
+                        required
+                        className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="quote-company" className="block text-sm font-medium text-card-foreground">
+                        {t.company}
+                      </label>
+                      <input
+                        id="quote-company"
+                        name="company"
+                        type="text"
+                        placeholder={t.company}
+                        autoComplete="organization"
+                        className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="quote-email" className="block text-sm font-medium text-card-foreground">
+                        {t.fieldLabels.email}
+                      </label>
+                      <input
+                        id="quote-email"
+                        name="email"
+                        type="email"
+                        placeholder={t.email}
+                        autoComplete="email"
+                        spellCheck={false}
+                        required
+                        className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="quote-phone" className="block text-sm font-medium text-card-foreground">
+                        {t.fieldLabels.phone}
+                      </label>
+                      <input
+                        id="quote-phone"
+                        name="phone"
+                        type="tel"
+                        placeholder={t.phone}
+                        autoComplete="tel"
+                        required
+                        className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -519,10 +577,20 @@ export default function QuoteSection() {
                   aria-hidden="true"
                 />
 
-                {status.message ? <p className={`text-sm rounded-lg px-4 py-3 ${statusClassName}`}>{status.message}</p> : null}
+                {status.message ? <p aria-live="polite" className={`text-sm rounded-lg px-4 py-3 ${statusClassName}`}>{status.message}</p> : null}
 
                 <div className="pt-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <p className="text-xs text-muted-foreground text-center sm:text-left">{t.consent}</p>
+                  <p className="text-xs text-muted-foreground text-center sm:text-left">
+                    {t.consentPrefix}{" "}
+                    <Link href="/privacidad" className="text-primary hover:text-primary/80 underline underline-offset-4">
+                      {t.privacyLabel}
+                    </Link>{" "}
+                    &amp;{" "}
+                    <Link href="/terminos" className="text-primary hover:text-primary/80 underline underline-offset-4">
+                      {t.termsLabel}
+                    </Link>
+                    .
+                  </p>
                   <Button
                     type="submit"
                     size="lg"

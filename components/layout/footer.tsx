@@ -1,8 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Badge } from "@/components/ui/badge"
-import { Github, Linkedin, Instagram, Mail, MessageCircle, ShieldCheck, Star } from "lucide-react"
+import { Github, Linkedin, Instagram, Mail, MessageCircle } from "lucide-react"
 import { useLanguage } from "@/components/providers/language-provider"
 
 const WHATSAPP_NUMBER = "584166022478" // +58 416 602 24 78
@@ -32,6 +31,13 @@ const copy = {
         ],
       },
       {
+        title: "Legal",
+        links: [
+          { label: "Privacidad", href: "/privacidad" },
+          { label: "Términos", href: "/terminos" },
+        ],
+      },
+      {
         title: "Contacto",
         links: [
           { label: "Cotiza tu proyecto", href: "/cotizacion" },
@@ -42,8 +48,11 @@ const copy = {
       },
     ],
     rights: "© 2026 Avila System. Todos los derechos reservados.",
-    badgeSatisfaction: "4.9/5 satisfacción",
-    badgeUptime: "99.9% uptime",
+    legalLinksLabel: "Accesos legales",
+    legalLinks: [
+      { label: "Privacidad", href: "/privacidad" },
+      { label: "Términos", href: "/terminos" },
+    ],
   },
   en: {
     tagline:
@@ -69,6 +78,13 @@ const copy = {
         ],
       },
       {
+        title: "Legal",
+        links: [
+          { label: "Privacy", href: "/privacidad" },
+          { label: "Terms", href: "/terminos" },
+        ],
+      },
+      {
         title: "Contact",
         links: [
           { label: "Request a quote", href: "/cotizacion" },
@@ -79,8 +95,11 @@ const copy = {
       },
     ],
     rights: "© 2026 Avila System. All rights reserved.",
-    badgeSatisfaction: "4.9/5 satisfaction",
-    badgeUptime: "99.9% uptime",
+    legalLinksLabel: "Legal shortcuts",
+    legalLinks: [
+      { label: "Privacy", href: "/privacidad" },
+      { label: "Terms", href: "/terminos" },
+    ],
   },
 }
 
@@ -124,7 +143,7 @@ export default function Footer() {
   return (
     <footer className="bg-sidebar border-t border-sidebar-border">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-5 gap-8">
           <div>
             <Link href="/" className="flex items-center space-x-2 mb-4 group">
               <div className="h-8 w-8 bg-sidebar-primary rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:rotate-12">
@@ -186,15 +205,13 @@ export default function Footer() {
         </div>
         <div className="border-t border-sidebar-border mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sidebar-foreground/70 text-sm">{t.rights}</p>
-          <div className="flex items-center space-x-3">
-            <Badge variant="outline" className="border-sidebar-primary/30 text-sidebar-primary gap-1">
-              <Star className="h-3 w-3" />
-              {t.badgeSatisfaction}
-            </Badge>
-            <Badge variant="outline" className="border-sidebar-primary/30 text-sidebar-primary gap-1">
-              <ShieldCheck className="h-3 w-3" />
-              {t.badgeUptime}
-            </Badge>
+          <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-sidebar-foreground/70 md:justify-end">
+            <span className="text-sidebar-foreground/55">{t.legalLinksLabel}</span>
+            {t.legalLinks.map((link) => (
+              <Link key={link.href} href={link.href} className="hover:text-sidebar-primary transition-colors duration-200">
+                {link.label}
+              </Link>
+            ))}
           </div>
         </div>
       </div>

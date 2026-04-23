@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 import {
   Select,
   SelectContent,
@@ -12,6 +13,7 @@ import {
 import { Mail, Phone, MapPin, Rocket, Clock, Users, Award, MessageCircle } from "lucide-react"
 import { useLanguage } from "@/components/providers/language-provider"
 import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
 
 const WHATSAPP_DISPLAY = "+58 416 602 24 78"
 
@@ -67,6 +69,9 @@ const copy = {
     sending: "Enviando...",
     successMessage: "Mensaje enviado con exito. Te responderemos pronto.",
     errorMessage: "No pudimos enviar tu mensaje. Verifica los datos e intenta de nuevo.",
+    consentPrefix: "Al enviar, aceptas nuestro manejo de datos según la",
+    privacyLabel: "Política de Privacidad",
+    termsLabel: "Términos y Condiciones",
     missingFieldsIntro: "Completa estos campos para continuar:",
     projectDescriptionTooShort: "Describe mejor tu proyecto. Necesitamos al menos 10 caracteres.",
     fieldLabels: {
@@ -135,6 +140,9 @@ const copy = {
     sending: "Sending...",
     successMessage: "Message sent successfully. We will get back to you soon.",
     errorMessage: "We could not send your message. Please review your data and try again.",
+    consentPrefix: "By submitting, you accept our data handling as described in the",
+    privacyLabel: "Privacy Policy",
+    termsLabel: "Terms & Conditions",
     missingFieldsIntro: "Please complete these fields to continue:",
     projectDescriptionTooShort: "Please add more detail about your project. We need at least 10 characters.",
     fieldLabels: {
@@ -161,6 +169,7 @@ const PROJECT_DESCRIPTION_MIN_LENGTH = 10
 export default function ContactSection() {
   const { lang } = useLanguage()
   const t = copy[lang]
+  const router = useRouter()
   const [projectTypeValue, setProjectTypeValue] = useState("")
   const [budgetValue, setBudgetValue] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -268,6 +277,7 @@ export default function ContactSection() {
       setProjectTypeValue("")
       setBudgetValue("")
       setStatus({ type: "success", message: result?.message || t.successMessage })
+      router.push("/thank-you?lead=contact")
     } catch {
       setStatus({ type: "error", message: t.errorMessage })
     } finally {
@@ -336,40 +346,73 @@ export default function ContactSection() {
                 <h3 className="text-xl font-semibold text-foreground mb-6">{t.formHeading}</h3>
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input
-                      name="fullName"
-                      type="text"
-                      placeholder={t.fullName}
-                      required
-                      className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
-                    />
-                    <input
-                      name="company"
-                      type="text"
-                      placeholder={t.company}
-                      className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
-                    />
+                    <div className="space-y-2">
+                      <label htmlFor="contact-full-name" className="block text-sm font-medium text-foreground">
+                        {t.fieldLabels.fullName}
+                      </label>
+                      <input
+                        id="contact-full-name"
+                        name="fullName"
+                        type="text"
+                        placeholder={t.fullName}
+                        autoComplete="name"
+                        required
+                        className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="contact-company" className="block text-sm font-medium text-foreground">
+                        {t.company}
+                      </label>
+                      <input
+                        id="contact-company"
+                        name="company"
+                        type="text"
+                        placeholder={t.company}
+                        autoComplete="organization"
+                        className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
+                      />
+                    </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input
-                      name="email"
-                      type="email"
-                      placeholder={t.emailLabel}
-                      required
-                      className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
-                    />
-                    <input
-                      name="phone"
-                      type="tel"
-                      placeholder={t.phoneLabel}
-                      required
-                      className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
-                    />
+                    <div className="space-y-2">
+                      <label htmlFor="contact-email" className="block text-sm font-medium text-foreground">
+                        {t.fieldLabels.email}
+                      </label>
+                      <input
+                        id="contact-email"
+                        name="email"
+                        type="email"
+                        placeholder={t.emailLabel}
+                        autoComplete="email"
+                        spellCheck={false}
+                        required
+                        className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="contact-phone" className="block text-sm font-medium text-foreground">
+                        {t.fieldLabels.phone}
+                      </label>
+                      <input
+                        id="contact-phone"
+                        name="phone"
+                        type="tel"
+                        placeholder={t.phoneLabel}
+                        autoComplete="tel"
+                        required
+                        className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
+                      />
+                    </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Select value={projectTypeValue} onValueChange={setProjectTypeValue}>
                       <input type="hidden" name="projectType" value={projectTypeValue} />
+                      <label htmlFor="contact-project-type" className="sr-only">
+                        {t.fieldLabels.projectType}
+                      </label>
                       <SelectTrigger
+                        id="contact-project-type"
                         aria-label={t.projectType}
                         className={cn(
                           "h-auto w-full rounded-lg border border-border bg-input px-4 py-3 text-left text-sm shadow-none transition-all duration-300 hover:border-primary/50 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring",
@@ -392,7 +435,11 @@ export default function ContactSection() {
                     </Select>
                     <Select value={budgetValue} onValueChange={setBudgetValue}>
                       <input type="hidden" name="budget" value={budgetValue} />
+                      <label htmlFor="contact-budget" className="sr-only">
+                        {t.fieldLabels.budget}
+                      </label>
                       <SelectTrigger
+                        id="contact-budget"
                         aria-label={t.budgetLabel}
                         className={cn(
                           "h-auto w-full rounded-lg border border-border bg-input px-4 py-3 text-left text-sm shadow-none transition-all duration-300 hover:border-primary/50 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring",
@@ -414,20 +461,33 @@ export default function ContactSection() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <input
-                    name="industry"
-                    type="text"
-                    placeholder={t.industry}
-                    className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
-                  />
-                  <textarea
-                    name="projectDescription"
-                    placeholder={t.projectDesc}
-                    rows={5}
-                    minLength={PROJECT_DESCRIPTION_MIN_LENGTH}
-                    required
-                    className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground resize-none transition-all duration-300 hover:border-primary/50"
-                  />
+                  <div className="space-y-2">
+                    <label htmlFor="contact-industry" className="block text-sm font-medium text-foreground">
+                      {t.industry}
+                    </label>
+                    <input
+                      id="contact-industry"
+                      name="industry"
+                      type="text"
+                      placeholder={t.industry}
+                      autoComplete="organization-title"
+                      className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="contact-project-description" className="block text-sm font-medium text-foreground">
+                      {t.fieldLabels.projectDescription}
+                    </label>
+                    <textarea
+                      id="contact-project-description"
+                      name="projectDescription"
+                      placeholder={t.projectDesc}
+                      rows={5}
+                      minLength={PROJECT_DESCRIPTION_MIN_LENGTH}
+                      required
+                      className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground resize-none transition-all duration-300 hover:border-primary/50"
+                    />
+                  </div>
 
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-3">{t.contactPref}</label>
@@ -455,7 +515,19 @@ export default function ContactSection() {
                     aria-hidden="true"
                   />
 
-                  {status.message ? <p className={`text-sm rounded-lg px-4 py-3 ${statusClassName}`}>{status.message}</p> : null}
+                  {status.message ? <p aria-live="polite" className={`text-sm rounded-lg px-4 py-3 ${statusClassName}`}>{status.message}</p> : null}
+
+                  <p className="text-xs text-muted-foreground">
+                    {t.consentPrefix}{" "}
+                    <Link href="/privacidad" className="text-primary hover:text-primary/80 underline underline-offset-4">
+                      {t.privacyLabel}
+                    </Link>{" "}
+                    &amp;{" "}
+                    <Link href="/terminos" className="text-primary hover:text-primary/80 underline underline-offset-4">
+                      {t.termsLabel}
+                    </Link>
+                    .
+                  </p>
 
                   <Button
                     type="submit"
