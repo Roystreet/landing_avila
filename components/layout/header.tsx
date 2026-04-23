@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { ArrowRight, Menu, X } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { LanguageToggle } from "@/components/ui/language-toggle"
@@ -46,12 +47,19 @@ export default function Header() {
   ]
 
   return (
-    <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 fixed top-0 w-full z-50 transition-all duration-300">
+    <header className="border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 fixed top-0 w-full z-50 transition-all duration-300">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           <Link href="/" className="flex items-center space-x-2 group">
-            <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
-              <span className="text-primary-foreground font-bold text-lg">A</span>
+            <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-border/60 bg-background shadow-sm transition-transform duration-300 group-hover:scale-105">
+              <Image
+                src="/logo_marillo.png"
+                alt="Logo de Avila System"
+                fill
+                sizes="48px"
+                className="object-contain p-0.5 scale-110"
+                priority
+              />
             </div>
             <span className="text-xl font-bold text-foreground">Avila System</span>
           </Link>
@@ -62,9 +70,8 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-sm text-muted-foreground hover:text-foreground transition-all duration-300 relative ${
-                  pathname === item.href ? "text-primary" : ""
-                }`}
+                className={`text-sm text-muted-foreground hover:text-foreground transition-all duration-300 relative ${pathname === item.href ? "text-primary" : ""
+                  }`}
               >
                 {item.label}
                 {pathname === item.href && (
@@ -108,9 +115,8 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`block px-4 py-2 text-muted-foreground hover:text-foreground transition-colors ${
-                    pathname === item.href ? "text-primary bg-primary/10" : ""
-                  }`}
+                  className={`block px-4 py-2 text-muted-foreground hover:text-foreground transition-colors ${pathname === item.href ? "text-primary bg-primary/10" : ""
+                    }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.label}
