@@ -1,10 +1,12 @@
 "use client"
 
 import Link from "next/link"
-import { Github, Linkedin, Instagram, Mail, MessageCircle } from "lucide-react"
+import { Github, Linkedin, Instagram, Mail } from "lucide-react"
 import { useLanguage } from "@/components/providers/language-provider"
+import { Logo } from "@/components/brand/logo"
+import { CONTACT_EMAIL, WHATSAPP_URL } from "@/lib/contact"
+import { WhatsAppIcon } from "@/components/brand/whatsapp-icon"
 
-const WHATSAPP_NUMBER = "584166022478" // +58 416 602 24 78
 
 const copy = {
   es: {
@@ -14,11 +16,11 @@ const copy = {
       {
         title: "Servicios",
         links: [
-          { label: "Desarrollo Web", href: "/servicios" },
-          { label: "Aplicaciones Móviles", href: "/servicios" },
-          { label: "Sistemas Web", href: "/servicios" },
-          { label: "Cloud & DevOps", href: "/servicios" },
-          { label: "Agentes de IA", href: "/servicios" },
+          { label: "Desarrollo web", href: "/servicios#web" },
+          { label: "Apps móviles", href: "/servicios#movil" },
+          { label: "Sistemas empresariales", href: "/servicios#sistemas" },
+          { label: "IA y automatización", href: "/servicios#ia" },
+          { label: "Cloud y DevOps", href: "/servicios#cloud" },
         ],
       },
       {
@@ -31,19 +33,12 @@ const copy = {
         ],
       },
       {
-        title: "Legal",
-        links: [
-          { label: "Privacidad", href: "/privacidad" },
-          { label: "Términos", href: "/terminos" },
-        ],
-      },
-      {
         title: "Contacto",
         links: [
           { label: "Cotiza tu proyecto", href: "/cotizacion" },
           { label: "Formulario de contacto", href: "/contacto" },
-          { label: "soluciones@avilasystem.com", href: "mailto:soluciones@avilasystem.com" },
-          { label: "WhatsApp directo", href: `https://wa.me/${WHATSAPP_NUMBER}` },
+          { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
+          { label: "WhatsApp directo", href: WHATSAPP_URL },
         ],
       },
     ],
@@ -61,11 +56,11 @@ const copy = {
       {
         title: "Services",
         links: [
-          { label: "Web Development", href: "/servicios" },
-          { label: "Mobile Applications", href: "/servicios" },
-          { label: "Web Systems", href: "/servicios" },
-          { label: "Cloud & DevOps", href: "/servicios" },
-          { label: "AI Agents", href: "/servicios" },
+          { label: "Web development", href: "/servicios#web" },
+          { label: "Mobile apps", href: "/servicios#movil" },
+          { label: "Enterprise systems", href: "/servicios#sistemas" },
+          { label: "AI & automation", href: "/servicios#ia" },
+          { label: "Cloud & DevOps", href: "/servicios#cloud" },
         ],
       },
       {
@@ -78,19 +73,12 @@ const copy = {
         ],
       },
       {
-        title: "Legal",
-        links: [
-          { label: "Privacy", href: "/privacidad" },
-          { label: "Terms", href: "/terminos" },
-        ],
-      },
-      {
         title: "Contact",
         links: [
           { label: "Request a quote", href: "/cotizacion" },
           { label: "Contact form", href: "/contacto" },
-          { label: "soluciones@avilasystem.com", href: "mailto:soluciones@avilasystem.com" },
-          { label: "WhatsApp direct", href: `https://wa.me/${WHATSAPP_NUMBER}` },
+          { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
+          { label: "WhatsApp direct", href: WHATSAPP_URL },
         ],
       },
     ],
@@ -128,66 +116,57 @@ export default function Footer() {
     },
     {
       label: "WhatsApp",
-      href: `https://wa.me/${WHATSAPP_NUMBER}`,
-      icon: MessageCircle,
+      href: WHATSAPP_URL,
+      icon: WhatsAppIcon,
       external: true,
     },
     {
       label: "Email",
-      href: "mailto:soluciones@avilasystem.com",
+      href: `mailto:${CONTACT_EMAIL}`,
       icon: Mail,
       external: false,
     },
   ]
 
   return (
-    <footer className="bg-sidebar border-t border-sidebar-border">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid md:grid-cols-5 gap-8">
-          <div>
-            <Link href="/" className="flex items-center space-x-2 mb-4 group">
-              <div className="h-8 w-8 bg-sidebar-primary rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:rotate-12">
-                <span className="text-sidebar-primary-foreground font-bold text-lg">A</span>
-              </div>
-              <span className="text-xl font-bold text-sidebar-foreground">Avila System</span>
+    <footer className="dark bg-background text-foreground">
+      <div className="mx-auto max-w-7xl px-4 pb-10 pt-16 sm:px-6 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-[1.4fr_repeat(3,1fr)] lg:gap-8">
+          <div className="max-w-xs">
+            <Link href="/" aria-label="Avila System, inicio" className="inline-block rounded-md">
+              <Logo />
             </Link>
-            <p className="text-sidebar-foreground/70 mb-5 text-sm leading-relaxed">{t.tagline}</p>
-            <div className="flex flex-wrap gap-2">
+            <p className="mt-5 text-sm leading-relaxed text-muted-foreground">{t.tagline}</p>
+            <div className="mt-6 flex flex-wrap gap-1">
               {socials.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
                   aria-label={social.label}
                   title={social.label}
-                  {...(social.external
-                    ? { target: "_blank", rel: "noopener noreferrer" }
-                    : {})}
-                  className="h-9 w-9 bg-sidebar-primary/10 border border-sidebar-primary/20 rounded-lg flex items-center justify-center text-sidebar-primary hover:bg-sidebar-primary hover:text-sidebar-primary-foreground hover:scale-110 transition-all duration-300"
+                  {...(social.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
-                  <social.icon className="h-4 w-4" />
+                  <social.icon className="h-[18px] w-[18px]" />
                 </a>
               ))}
             </div>
           </div>
           {t.sections.map((section) => (
             <div key={section.title}>
-              <h4 className="font-semibold text-sidebar-foreground mb-4">{section.title}</h4>
-              <ul className="space-y-2 text-sidebar-foreground/70 text-sm">
+              <h2 className="text-sm font-semibold text-foreground">{section.title}</h2>
+              <ul className="mt-3 text-sm text-muted-foreground">
                 {section.links.map((link) => {
                   const isExternal =
-                    link.href.startsWith("http") ||
-                    link.href.startsWith("mailto:") ||
-                    link.href.startsWith("tel:")
-                  const className = "hover:text-sidebar-primary transition-colors duration-200"
+                    link.href.startsWith("http") || link.href.startsWith("mailto:") || link.href.startsWith("tel:")
+                  const className = "inline-block break-all py-2 transition-colors hover:text-foreground"
                   return (
                     <li key={link.label}>
                       {isExternal ? (
                         <a
                           href={link.href}
                           className={className}
-                          {...(link.href.startsWith("http")
-                            ? { target: "_blank", rel: "noopener noreferrer" }
-                            : {})}
+                          {...(link.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                         >
                           {link.label}
                         </a>
@@ -203,16 +182,15 @@ export default function Footer() {
             </div>
           ))}
         </div>
-        <div className="border-t border-sidebar-border mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sidebar-foreground/70 text-sm">{t.rights}</p>
-          <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-sidebar-foreground/70 md:justify-end">
-            <span className="text-sidebar-foreground/55">{t.legalLinksLabel}</span>
+        <div className="mt-14 flex flex-col gap-4 border-t border-border pt-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
+          <p>{t.rights}</p>
+          <nav aria-label={t.legalLinksLabel} className="flex items-center gap-2">
             {t.legalLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="hover:text-sidebar-primary transition-colors duration-200">
+              <Link key={link.href} href={link.href} className="px-2 py-2 transition-colors hover:text-foreground">
                 {link.label}
               </Link>
             ))}
-          </div>
+          </nav>
         </div>
       </div>
     </footer>

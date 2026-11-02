@@ -1,7 +1,10 @@
+import type { Metadata } from "next"
 import PricingSection from "@/components/sections/pricing-section"
 import QuoteSection from "@/components/sections/quote-section"
 import Footer from "@/components/layout/footer"
 import { PageHero } from "@/components/layout/page-hero"
+
+export const metadata: Metadata = { title: "Precios" }
 
 export default function PreciosPage() {
   return (

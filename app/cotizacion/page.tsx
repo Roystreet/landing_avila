@@ -1,6 +1,9 @@
+import type { Metadata } from "next"
 import QuoteSection from "@/components/sections/quote-section"
 import Footer from "@/components/layout/footer"
 import { PageHero } from "@/components/layout/page-hero"
+
+export const metadata: Metadata = { title: "Cotiza tu proyecto" }
 
 export default function CotizacionPage() {
   return (

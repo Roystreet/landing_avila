@@ -1,33 +1,36 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ArrowRight, Menu, X } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { LanguageToggle } from "@/components/ui/language-toggle"
+import { Logo } from "@/components/brand/logo"
 import { useLanguage } from "@/components/providers/language-provider"
+import { cn } from "@/lib/utils"
 
 const nav = {
   es: {
     services: "Servicios",
+    cases: "Proyectos",
     pricing: "Precios",
     mission: "Misión",
-    cases: "Casos de Éxito",
-    quote: "Cotizar",
+    about: "Nosotros",
     contact: "Contacto",
-    cta: "Cotiza tu proyecto",
+    cta: "Cotizar mi proyecto",
+    menu: "Abrir menú",
+    close: "Cerrar menú",
   },
   en: {
     services: "Services",
+    cases: "Projects",
     pricing: "Pricing",
     mission: "Mission",
-    cases: "Success Stories",
-    quote: "Get a Quote",
+    about: "About",
     contact: "Contact",
-    cta: "Request a quote",
+    cta: "Quote my project",
+    menu: "Open menu",
+    close: "Close menu",
   },
 }
 
@@ -37,106 +40,94 @@ export default function Header() {
   const { lang } = useLanguage()
   const t = nav[lang]
 
+  useEffect(() => setIsMenuOpen(false), [pathname])
+
   const navItems = [
     { href: "/servicios", label: t.services },
+    { href: "/casos-de-exito", label: t.cases },
     { href: "/precios", label: t.pricing },
     { href: "/mision", label: t.mission },
-    { href: "/casos-de-exito", label: t.cases },
-    { href: "/cotizacion", label: t.quote },
+    { href: "/nosotros", label: t.about },
     { href: "/contacto", label: t.contact },
   ]
 
   return (
-    <header className="border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 fixed top-0 w-full z-50 transition-all duration-300">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between gap-4">
-          <Link href="/" className="flex items-center space-x-2 group">
-            <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-border/60 bg-background shadow-sm transition-transform duration-300 group-hover:scale-105">
-              <Image
-                src="/logo_marillo.png"
-                alt="Logo de Avila System"
-                fill
-                sizes="48px"
-                className="object-contain p-0.5 scale-110"
-                priority
-              />
-            </div>
-            <span className="text-xl font-bold text-foreground">Avila System</span>
-          </Link>
+    <header className="dark fixed top-0 z-50 w-full border-b border-border bg-background text-foreground">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+        <Link href="/" aria-label="Avila System, inicio" className="rounded-md">
+          <Logo />
+        </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
+        <nav aria-label="Principal" className="hidden items-center gap-7 lg:gap-8 md:flex">
+          {navItems.map((item) => {
+            const active = pathname === item.href
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "relative py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground",
+                  active && "text-foreground after:absolute after:inset-x-0 after:-bottom-[1px] after:h-0.5 after:rounded-full after:bg-primary",
+                )}
+              >
+                {item.label}
+              </Link>
+            )
+          })}
+        </nav>
+
+        <div className="flex items-center gap-2">
+          <LanguageToggle className="hidden sm:inline-flex" />
+          <Link
+            href="/cotizacion"
+            className="group hidden items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-[var(--primary-hover)] md:inline-flex"
+          >
+            {t.cta}
+            <ArrowRight className="h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5" />
+          </Link>
+          <button
+            type="button"
+            onClick={() => setIsMenuOpen((open) => !open)}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-nav"
+            aria-label={isMenuOpen ? t.close : t.menu}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-md text-foreground hover:bg-muted md:hidden"
+          >
+            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+      </div>
+
+      {isMenuOpen && (
+        <div id="mobile-nav" className="border-t border-border bg-background md:hidden">
+          <nav aria-label="Principal" className="mx-auto max-w-7xl space-y-1 px-4 py-4">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-sm text-muted-foreground hover:text-foreground transition-all duration-300 relative ${pathname === item.href ? "text-primary" : ""
-                  }`}
+                aria-current={pathname === item.href ? "page" : undefined}
+                className={cn(
+                  "block rounded-lg px-3 py-3 text-base font-medium text-muted-foreground hover:bg-muted hover:text-foreground",
+                  pathname === item.href && "bg-muted text-foreground",
+                )}
               >
                 {item.label}
-                {pathname === item.href && (
-                  <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-primary animate-pulse" />
-                )}
               </Link>
             ))}
-          </nav>
-
-          {/* Right cluster: toggles + CTA */}
-          <div className="flex items-center gap-1">
-            <div className="hidden sm:flex items-center">
-              <LanguageToggle />
-              <ThemeToggle />
-            </div>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <Button variant="ghost" size="sm" onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2">
-                {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
-            </div>
-
-            {/* CTA Button */}
-            <div className="hidden md:block ml-2">
-              <Link href="/cotizacion">
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105 hover:shadow-lg group">
-                  {t.cta}
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </Button>
+            <div className="flex items-center gap-3 pt-3">
+              <Link
+                href="/cotizacion"
+                className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground"
+              >
+                {t.cta}
+                <ArrowRight className="h-4 w-4" />
               </Link>
+              <LanguageToggle />
             </div>
-          </div>
+          </nav>
         </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden border-t border-border bg-background/95 backdrop-blur">
-            <nav className="py-4 space-y-2">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`block px-4 py-2 text-muted-foreground hover:text-foreground transition-colors ${pathname === item.href ? "text-primary bg-primary/10" : ""
-                    }`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <div className="px-4 pt-2 flex items-center gap-2">
-                <LanguageToggle />
-                <ThemeToggle />
-              </div>
-              <div className="px-4 pt-2">
-                <Link href="/cotizacion">
-                  <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-                    {t.cta}
-                  </Button>
-                </Link>
-              </div>
-            </nav>
-          </div>
-        )}
-      </div>
+      )}
     </header>
   )
 }

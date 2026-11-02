@@ -1,0 +1,731 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-02T19:24:20.000Z",
+  "title": "Design System: Avila System",
+  "extensions": {
+    "colorMeta": {
+      "signal-blue": {
+        "role": "primary",
+        "displayName": "Azul Señal",
+        "canonical": "oklch(0.546 0.215 263)",
+        "tonalRamp": [
+          "oklch(0.15 0.118 263)",
+          "oklch(0.26 0.143 263)",
+          "oklch(0.38 0.167 263)",
+          "oklch(0.49 0.192 263)",
+          "oklch(0.61 0.213 263)",
+          "oklch(0.72 0.189 263)",
+          "oklch(0.84 0.164 263)",
+          "oklch(0.95 0.140 263)"
+        ]
+      },
+      "signal-blue-deep": {
+        "role": "primary",
+        "displayName": "Azul Señal Profundo",
+        "canonical": "oklch(0.49 0.21 263)",
+        "tonalRamp": [
+          "oklch(0.15 0.116 263)",
+          "oklch(0.26 0.140 263)",
+          "oklch(0.38 0.164 263)",
+          "oklch(0.49 0.188 263)",
+          "oklch(0.61 0.208 263)",
+          "oklch(0.72 0.184 263)",
+          "oklch(0.84 0.160 263)",
+          "oklch(0.95 0.136 263)"
+        ]
+      },
+      "summit-blue": {
+        "role": "secondary",
+        "displayName": "Azul Cumbre",
+        "canonical": "oklch(0.68 0.17 258)",
+        "tonalRamp": [
+          "oklch(0.15 0.094 258)",
+          "oklch(0.26 0.113 258)",
+          "oklch(0.38 0.132 258)",
+          "oklch(0.49 0.152 258)",
+          "oklch(0.61 0.169 258)",
+          "oklch(0.72 0.149 258)",
+          "oklch(0.84 0.130 258)",
+          "oklch(0.95 0.110 258)"
+        ]
+      },
+      "summit-light": {
+        "role": "secondary",
+        "displayName": "Luz de Cumbre",
+        "canonical": "oklch(0.92 0.06 240)",
+        "tonalRamp": [
+          "oklch(0.15 0.033 240)",
+          "oklch(0.26 0.040 240)",
+          "oklch(0.38 0.047 240)",
+          "oklch(0.49 0.054 240)",
+          "oklch(0.61 0.060 240)",
+          "oklch(0.72 0.053 240)",
+          "oklch(0.84 0.046 240)",
+          "oklch(0.95 0.039 240)"
+        ]
+      },
+      "night": {
+        "role": "neutral",
+        "displayName": "Azul Noche",
+        "canonical": "oklch(0.17 0.025 265)",
+        "tonalRamp": [
+          "oklch(0.15 0.014 265)",
+          "oklch(0.26 0.017 265)",
+          "oklch(0.38 0.019 265)",
+          "oklch(0.49 0.022 265)",
+          "oklch(0.61 0.025 265)",
+          "oklch(0.72 0.022 265)",
+          "oklch(0.84 0.019 265)",
+          "oklch(0.95 0.016 265)"
+        ]
+      },
+      "night-sky-deep": {
+        "role": "neutral",
+        "displayName": "Noche Profunda",
+        "canonical": "oklch(0.15 0.022 265)",
+        "tonalRamp": [
+          "oklch(0.15 0.012 265)",
+          "oklch(0.26 0.015 265)",
+          "oklch(0.38 0.017 265)",
+          "oklch(0.49 0.020 265)",
+          "oklch(0.61 0.022 265)",
+          "oklch(0.72 0.019 265)",
+          "oklch(0.84 0.017 265)",
+          "oklch(0.95 0.014 265)"
+        ]
+      },
+      "night-horizon": {
+        "role": "neutral",
+        "displayName": "Horizonte",
+        "canonical": "oklch(0.24 0.05 262)",
+        "tonalRamp": [
+          "oklch(0.15 0.028 262)",
+          "oklch(0.26 0.033 262)",
+          "oklch(0.38 0.039 262)",
+          "oklch(0.49 0.045 262)",
+          "oklch(0.61 0.050 262)",
+          "oklch(0.72 0.044 262)",
+          "oklch(0.84 0.038 262)",
+          "oklch(0.95 0.032 262)"
+        ]
+      },
+      "ridge-shadow": {
+        "role": "neutral",
+        "displayName": "Sombra de Cresta",
+        "canonical": "oklch(0.12 0.02 265)",
+        "tonalRamp": [
+          "oklch(0.15 0.011 265)",
+          "oklch(0.26 0.013 265)",
+          "oklch(0.38 0.016 265)",
+          "oklch(0.49 0.018 265)",
+          "oklch(0.61 0.020 265)",
+          "oklch(0.72 0.018 265)",
+          "oklch(0.84 0.015 265)",
+          "oklch(0.95 0.013 265)"
+        ]
+      },
+      "night-raised": {
+        "role": "neutral",
+        "displayName": "Noche Elevada",
+        "canonical": "oklch(0.215 0.03 265)",
+        "tonalRamp": [
+          "oklch(0.15 0.017 265)",
+          "oklch(0.26 0.020 265)",
+          "oklch(0.38 0.023 265)",
+          "oklch(0.49 0.027 265)",
+          "oklch(0.61 0.030 265)",
+          "oklch(0.72 0.026 265)",
+          "oklch(0.84 0.023 265)",
+          "oklch(0.95 0.019 265)"
+        ]
+      },
+      "night-bubble": {
+        "role": "neutral",
+        "displayName": "Burbuja Nocturna",
+        "canonical": "oklch(0.27 0.04 264)",
+        "tonalRamp": [
+          "oklch(0.15 0.022 264)",
+          "oklch(0.26 0.027 264)",
+          "oklch(0.38 0.031 264)",
+          "oklch(0.49 0.036 264)",
+          "oklch(0.61 0.040 264)",
+          "oklch(0.72 0.035 264)",
+          "oklch(0.84 0.031 264)",
+          "oklch(0.95 0.026 264)"
+        ]
+      },
+      "night-line": {
+        "role": "neutral",
+        "displayName": "Línea de Noche",
+        "canonical": "oklch(0.3 0.035 265)",
+        "tonalRamp": [
+          "oklch(0.15 0.019 265)",
+          "oklch(0.26 0.023 265)",
+          "oklch(0.38 0.027 265)",
+          "oklch(0.49 0.031 265)",
+          "oklch(0.61 0.035 265)",
+          "oklch(0.72 0.031 265)",
+          "oklch(0.84 0.027 265)",
+          "oklch(0.95 0.023 265)"
+        ]
+      },
+      "trail-dashed": {
+        "role": "neutral",
+        "displayName": "Sendero Punteado",
+        "canonical": "oklch(0.36 0.04 262)",
+        "tonalRamp": [
+          "oklch(0.15 0.022 262)",
+          "oklch(0.26 0.027 262)",
+          "oklch(0.38 0.031 262)",
+          "oklch(0.49 0.036 262)",
+          "oklch(0.61 0.040 262)",
+          "oklch(0.72 0.035 262)",
+          "oklch(0.84 0.031 262)",
+          "oklch(0.95 0.026 262)"
+        ]
+      },
+      "ridge-outline": {
+        "role": "neutral",
+        "displayName": "Contorno de Cresta",
+        "canonical": "oklch(0.45 0.03 260)",
+        "tonalRamp": [
+          "oklch(0.15 0.017 260)",
+          "oklch(0.26 0.020 260)",
+          "oklch(0.38 0.023 260)",
+          "oklch(0.49 0.027 260)",
+          "oklch(0.61 0.030 260)",
+          "oklch(0.72 0.026 260)",
+          "oklch(0.84 0.023 260)",
+          "oklch(0.95 0.019 260)"
+        ]
+      },
+      "night-mist": {
+        "role": "neutral",
+        "displayName": "Bruma Nocturna",
+        "canonical": "oklch(0.78 0.03 257)",
+        "tonalRamp": [
+          "oklch(0.15 0.017 257)",
+          "oklch(0.26 0.020 257)",
+          "oklch(0.38 0.023 257)",
+          "oklch(0.49 0.027 257)",
+          "oklch(0.61 0.030 257)",
+          "oklch(0.72 0.026 257)",
+          "oklch(0.84 0.023 257)",
+          "oklch(0.95 0.019 257)"
+        ]
+      },
+      "snow": {
+        "role": "neutral",
+        "displayName": "Nieve",
+        "canonical": "oklch(0.985 0.003 248)",
+        "tonalRamp": [
+          "oklch(0.15 0.002 248)",
+          "oklch(0.26 0.002 248)",
+          "oklch(0.38 0.002 248)",
+          "oklch(0.49 0.003 248)",
+          "oklch(0.61 0.003 248)",
+          "oklch(0.72 0.003 248)",
+          "oklch(0.84 0.002 248)",
+          "oklch(0.95 0.002 248)"
+        ]
+      },
+      "cold-paper": {
+        "role": "neutral",
+        "displayName": "Papel Frío",
+        "canonical": "oklch(0.984 0.003 248)",
+        "tonalRamp": [
+          "oklch(0.15 0.002 248)",
+          "oklch(0.26 0.002 248)",
+          "oklch(0.38 0.002 248)",
+          "oklch(0.49 0.003 248)",
+          "oklch(0.61 0.003 248)",
+          "oklch(0.72 0.003 248)",
+          "oklch(0.84 0.002 248)",
+          "oklch(0.95 0.002 248)"
+        ]
+      },
+      "surface-white": {
+        "role": "neutral",
+        "displayName": "Blanco de Superficie",
+        "canonical": "oklch(1 0 0)",
+        "tonalRamp": [
+          "oklch(0.15 0.000 0)",
+          "oklch(0.26 0.000 0)",
+          "oklch(0.38 0.000 0)",
+          "oklch(0.49 0.000 0)",
+          "oklch(0.61 0.000 0)",
+          "oklch(0.72 0.000 0)",
+          "oklch(0.84 0.000 0)",
+          "oklch(0.95 0.000 0)"
+        ]
+      },
+      "frost": {
+        "role": "neutral",
+        "displayName": "Escarcha",
+        "canonical": "oklch(0.955 0.01 255)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 255)",
+          "oklch(0.26 0.007 255)",
+          "oklch(0.38 0.008 255)",
+          "oklch(0.49 0.009 255)",
+          "oklch(0.61 0.010 255)",
+          "oklch(0.72 0.009 255)",
+          "oklch(0.84 0.008 255)",
+          "oklch(0.95 0.006 255)"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Línea Fina",
+        "canonical": "oklch(0.929 0.013 255)",
+        "tonalRamp": [
+          "oklch(0.15 0.007 255)",
+          "oklch(0.26 0.009 255)",
+          "oklch(0.38 0.010 255)",
+          "oklch(0.49 0.012 255)",
+          "oklch(0.61 0.013 255)",
+          "oklch(0.72 0.011 255)",
+          "oklch(0.84 0.010 255)",
+          "oklch(0.95 0.008 255)"
+        ]
+      },
+      "slate": {
+        "role": "neutral",
+        "displayName": "Pizarra",
+        "canonical": "oklch(0.711 0.035 257)",
+        "tonalRamp": [
+          "oklch(0.15 0.019 257)",
+          "oklch(0.26 0.023 257)",
+          "oklch(0.38 0.027 257)",
+          "oklch(0.49 0.031 257)",
+          "oklch(0.61 0.035 257)",
+          "oklch(0.72 0.031 257)",
+          "oklch(0.84 0.027 257)",
+          "oklch(0.95 0.023 257)"
+        ]
+      },
+      "ink-slate": {
+        "role": "neutral",
+        "displayName": "Pizarra Tinta",
+        "canonical": "oklch(0.446 0.037 257)",
+        "tonalRamp": [
+          "oklch(0.15 0.020 257)",
+          "oklch(0.26 0.025 257)",
+          "oklch(0.38 0.029 257)",
+          "oklch(0.49 0.033 257)",
+          "oklch(0.61 0.037 257)",
+          "oklch(0.72 0.033 257)",
+          "oklch(0.84 0.028 257)",
+          "oklch(0.95 0.024 257)"
+        ]
+      },
+      "whatsapp-green": {
+        "role": "external",
+        "displayName": "Verde WhatsApp",
+        "canonical": "#25D366",
+        "tonalRamp": [
+          "oklch(0.15 0.110 150)",
+          "oklch(0.26 0.133 150)",
+          "oklch(0.38 0.156 150)",
+          "oklch(0.49 0.179 150)",
+          "oklch(0.61 0.199 150)",
+          "oklch(0.72 0.176 150)",
+          "oklch(0.84 0.153 150)",
+          "oklch(0.95 0.130 150)"
+        ]
+      },
+      "whatsapp-green-deep": {
+        "role": "external",
+        "displayName": "Verde WhatsApp Profundo",
+        "canonical": "#1EBE5A",
+        "tonalRamp": [
+          "oklch(0.15 0.105 150)",
+          "oklch(0.26 0.126 150)",
+          "oklch(0.38 0.148 150)",
+          "oklch(0.49 0.170 150)",
+          "oklch(0.61 0.189 150)",
+          "oklch(0.72 0.167 150)",
+          "oklch(0.84 0.145 150)",
+          "oklch(0.95 0.123 150)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Solo el titular del hero de la home, a partir de 1024px (4rem)."
+      },
+      "display-sm": {
+        "displayName": "Display móvil",
+        "purpose": "El mismo titular del hero por debajo de 640px (2.5rem); 3.75rem entre 640 y 1024px."
+      },
+      "page-title": {
+        "displayName": "Page Title",
+        "purpose": "Heros internos y 404 desde 768px."
+      },
+      "page-title-sm": {
+        "displayName": "Page Title móvil",
+        "purpose": "Heros internos y 404 en móvil."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Títulos de sección y de bandas desde 768px."
+      },
+      "headline-sm": {
+        "displayName": "Headline móvil",
+        "purpose": "Títulos de sección y de bandas en móvil."
+      },
+      "metric": {
+        "displayName": "Metric",
+        "purpose": "Métrica del caso destacado, en azul señal."
+      },
+      "metric-sm": {
+        "displayName": "Metric secundaria",
+        "purpose": "Métrica de los casos secundarios."
+      },
+      "stat": {
+        "displayName": "Stat",
+        "purpose": "Las tres cifras confirmadas del hero."
+      },
+      "title-lg": {
+        "displayName": "Title Large",
+        "purpose": "Necesidad de cada grupo de servicios y nombre de servicio en /servicios."
+      },
+      "quote": {
+        "displayName": "Quote",
+        "purpose": "Testimonios grandes desde 768px."
+      },
+      "quote-sm": {
+        "displayName": "Quote móvil",
+        "purpose": "Testimonios en móvil."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Nombre de servicio en las filas y paso del proceso."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Bajadas del hero y de heros internos, en bruma nocturna."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Introducciones de sección."
+      },
+      "body-sm": {
+        "displayName": "Body pequeño",
+        "purpose": "Descripciones de filas, tarjetas y pasos; chips de stack."
+      },
+      "label-lg": {
+        "displayName": "Label grande",
+        "purpose": "CTAs del hero y del cierre."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Botón de la cabecera, enlaces de acción, navegación (500)."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Pies de figura y créditos."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-glow",
+        "value": "0 18px 40px -20px oklch(0.546 0.215 263 / 0.45)",
+        "purpose": "Hover de la tarjeta de proyecto, junto con borde azul señal al 40%."
+      },
+      {
+        "name": "row-lift",
+        "value": "0 8px 24px -16px oklch(0.17 0.025 265 / 0.35)",
+        "purpose": "Hover de las filas de servicio, junto con fondo blanco."
+      },
+      {
+        "name": "stage",
+        "value": "0 30px 60px -24px oklch(0.05 0.03 265 / 0.8)",
+        "purpose": "Panel de sprint del hero, en reposo."
+      },
+      {
+        "name": "stage-scene",
+        "value": "0 24px 48px -20px oklch(0.1 0.03 265 / 0.55)",
+        "purpose": "Escenas de interfaz de proyectos, en reposo."
+      },
+      {
+        "name": "summit-glow",
+        "value": "0 0 0 6px oklch(0.68 0.17 258 / 0.25), 0 0 24px 4px oklch(0.68 0.17 258 / 0.5)",
+        "purpose": "Halo de la luz de cumbre sobre el Naiguatá (hero y cierre)."
+      },
+      {
+        "name": "waypoint-halo",
+        "value": "0 0 0 6px oklch(0.68 0.17 258 / 0.18)",
+        "purpose": "Parada del proceso alcanzada."
+      },
+      {
+        "name": "float",
+        "value": "0 12px 32px -12px oklch(0.1 0.03 265 / 0.6)",
+        "purpose": "Botón flotante de WhatsApp."
+      },
+      {
+        "name": "focus-ring",
+        "value": "outline: 2px solid var(--primary); outline-offset: 3px",
+        "purpose": "Foco visible global."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ridge-draw",
+        "value": "stroke-dashoffset 1 → 0, 2.4s cubic-bezier(0.65, 0, 0.35, 1), retardo 0.2s",
+        "purpose": "La cresta del Ávila se traza al cargar (hero, heros internos, 404)."
+      },
+      {
+        "name": "summit-light",
+        "value": "opacity 0 → 1 y scale 0.4 → 1, 0.8s cubic-bezier(0.16, 1, 0.3, 1), retardo 2.3s",
+        "purpose": "La luz del Naiguatá se enciende cuando termina el trazo del hero."
+      },
+      {
+        "name": "ascent-scroll",
+        "value": "stroke-dashoffset = 1 − progreso de scroll, transición 200ms ease-out",
+        "purpose": "El recorrido de la banda de proceso avanza con el scroll; en móvil un riel vertical escala en Y."
+      },
+      {
+        "name": "waypoint-reach",
+        "value": "background, border, color, box-shadow 300ms",
+        "purpose": "Una parada del proceso se enciende al ser alcanzada; su paso pasa de 55% a 100% de opacidad."
+      },
+      {
+        "name": "scene-pop",
+        "value": "opacity 0 → 1 y scale 0.85 → 1, 0.45s cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Citas, paradas y elementos que aparecen en las escenas de proyecto."
+      },
+      {
+        "name": "scene-slide",
+        "value": "opacity 0 → 1 y translateY 10px → 0, 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Mensajes y etiquetas de escenas; entregables y mensaje del panel de sprint."
+      },
+      {
+        "name": "scene-route",
+        "value": "stroke-dashoffset 1 → 0, 2s cubic-bezier(0.65, 0, 0.35, 1), retardo 0.4s",
+        "purpose": "Ruta de la escena logística."
+      },
+      {
+        "name": "scene-press",
+        "value": "scale 1 → 0.94 → 1 y fade, 0.55s ease-out, retardo 1.4s; éxito con fade 0.35s a 1.85s",
+        "purpose": "Pulsación del botón de pago en la escena de checkout."
+      },
+      {
+        "name": "scene-trigger",
+        "value": "IntersectionObserver, umbral 0.35, una vez; repetición en pointerenter",
+        "purpose": "Las escenas se reproducen al entrar en pantalla (hooks/use-in-view.ts); sin JS se ve el estado final."
+      },
+      {
+        "name": "sprint-fill",
+        "value": "width 8% → 66%, 1.6s cubic-bezier(0.16, 1, 0.3, 1), retardo 0.5s",
+        "purpose": "Barra del tramo en curso del panel de sprint."
+      },
+      {
+        "name": "sprint-stagger",
+        "value": "entregables a 0.9s + 0.35s × i; mensaje a 2.2s",
+        "purpose": "Entrada escalonada del panel de sprint al pintar, sin depender de JS."
+      },
+      {
+        "name": "pointer-tilt",
+        "value": "rotateX ±4°, rotateY ±5°, transform 500ms ease-out, perspective 1400px",
+        "purpose": "El panel de sprint se inclina con el cursor; solo con puntero fino y sin reducir movimiento."
+      },
+      {
+        "name": "photo-zoom",
+        "value": "scale 1 → 1.04, 700ms ease-out",
+        "purpose": "Foto de contexto de un proyecto en hover."
+      },
+      {
+        "name": "arrow-nudge",
+        "value": "translateX(0.125rem), 300ms ease-out",
+        "purpose": "La flecha de CTAs y enlaces de acción avanza en hover; la diagonal de servicios también sube."
+      },
+      {
+        "name": "card-light",
+        "value": "border-color, box-shadow 300ms",
+        "purpose": "Encendido de tarjetas de proyecto en hover."
+      },
+      {
+        "name": "float-reveal",
+        "value": "opacity y translateY 1rem, 300ms",
+        "purpose": "Aparición del botón flotante de WhatsApp tras el 70% del primer viewport."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation/transition-duration: 0.01ms; animation-delay: 0s",
+        "purpose": "Con prefers-reduced-motion todo movimiento se anula; el ascenso queda completo y el panel no se inclina."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón primario",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Píldora azul señal con flecha; siempre \"Cotizar mi proyecto\", en claro y en noche.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">Cotizar mi proyecto <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a>",
+      "css": ".ds-btn-primary { font-family: var(--font-montserrat), Montserrat, ui-sans-serif, system-ui, sans-serif; display: inline-flex; align-items: center; gap: 8px; background: oklch(0.546 0.215 263); color: #fff; padding: 14px 28px; border-radius: 9999px; font-size: 1rem; font-weight: 600; text-decoration: none; transition: background-color 0.15s; } .ds-btn-primary svg { transition: transform 0.3s ease-out; } .ds-btn-primary:hover { background: oklch(0.49 0.21 263); } .ds-btn-primary:hover svg { transform: translateX(2px); } .ds-btn-primary:focus-visible { outline: 2px solid oklch(0.546 0.215 263); outline-offset: 3px; }"
+    },
+    {
+      "name": "Botón WhatsApp en noche",
+      "kind": "button",
+      "refersTo": "button-whatsapp-night",
+      "description": "Segunda vía de contacto: píldora con contorno de cresta y glifo oficial de WhatsApp.",
+      "html": "<div class=\"ds-night-stage\"><a class=\"ds-btn-wa\" href=\"#\" data-wa-inline><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"#25D366\" aria-hidden=\"true\"><path d=\"M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z\"/></svg> Escribir por WhatsApp</a></div>",
+      "css": ".ds-night-stage { background: oklch(0.17 0.025 265); padding: 24px; border-radius: 14px; } .ds-btn-wa { font-family: var(--font-montserrat), Montserrat, ui-sans-serif, system-ui, sans-serif; display: inline-flex; align-items: center; gap: 8px; color: oklch(0.985 0.003 248); border: 1px solid oklch(0.45 0.03 260); padding: 14px 28px; border-radius: 9999px; font-size: 1rem; font-weight: 600; text-decoration: none; transition: border-color 0.15s, background-color 0.15s; } .ds-btn-wa:hover { border-color: oklch(0.985 0.003 248); background: rgb(255 255 255 / 0.05); } .ds-btn-wa:focus-visible { outline: 2px solid oklch(0.546 0.215 263); outline-offset: 3px; }"
+    },
+    {
+      "name": "Botón flotante de WhatsApp",
+      "kind": "button",
+      "refersTo": "whatsapp-float",
+      "description": "Círculo verde de 56px; aparece tras el primer viewport y se oculta mientras hay un botón de WhatsApp en línea visible.",
+      "html": "<a class=\"ds-wa-float\" href=\"#\" aria-label=\"Escribir por WhatsApp\"><svg width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z\"/></svg></a>",
+      "css": ".ds-wa-float { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 9999px; background: #25D366; color: #fff; box-shadow: 0 12px 32px -12px oklch(0.1 0.03 265 / 0.6); transition: background-color 0.3s, opacity 0.3s, transform 0.3s; } .ds-wa-float:hover { background: #1EBE5A; } .ds-wa-float:focus-visible { outline: 2px solid oklch(0.546 0.215 263); outline-offset: 3px; }"
+    },
+    {
+      "name": "Fila de servicio",
+      "kind": "custom",
+      "refersTo": "service-row",
+      "description": "Grupo por necesidad con filas enlazadas y flecha diagonal; sin tarjetas.",
+      "html": "<div class=\"ds-svc-group\"><h3 class=\"ds-svc-need\">Lanzar un producto</h3><p class=\"ds-svc-who\">Para startups y marcas que salen al mercado.</p><a class=\"ds-svc-row\" href=\"#\"><span class=\"ds-svc-text\"><span class=\"ds-svc-title\">Desarrollo web</span><span class=\"ds-svc-desc\">Sitios y plataformas rápidas, listas para vender.</span></span><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 7h10v10\"/><path d=\"M7 17 17 7\"/></svg></a><a class=\"ds-svc-row\" href=\"#\"><span class=\"ds-svc-text\"><span class=\"ds-svc-title\">Apps móviles</span><span class=\"ds-svc-desc\">iOS y Android, publicadas en las tiendas.</span></span><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 7h10v10\"/><path d=\"M7 17 17 7\"/></svg></a></div>",
+      "css": ".ds-svc-group { font-family: var(--font-montserrat), Montserrat, ui-sans-serif, system-ui, sans-serif; background: oklch(0.984 0.003 248); color: oklch(0.17 0.025 265); border-top: 1px solid oklch(0.17 0.025 265 / 0.8); padding: 32px 12px 8px; max-width: 380px; } .ds-svc-need { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; margin: 0; } .ds-svc-who { margin: 8px 0 28px; font-size: 0.875rem; color: oklch(0.446 0.037 257); } .ds-svc-row { display: flex; align-items: flex-start; gap: 16px; margin: 0 -12px 8px; padding: 14px 12px; border-radius: 18px; color: inherit; text-decoration: none; transition: background-color 0.15s, box-shadow 0.15s; } .ds-svc-text { flex: 1; } .ds-svc-title { display: block; font-weight: 600; } .ds-svc-desc { display: block; margin-top: 4px; font-size: 0.875rem; line-height: 1.625; color: oklch(0.446 0.037 257); } .ds-svc-row svg { flex-shrink: 0; margin-top: 2px; color: oklch(0.546 0.215 263); transition: transform 0.3s ease-out; } .ds-svc-row:hover { background: #fff; box-shadow: 0 8px 24px -16px oklch(0.17 0.025 265 / 0.35); } .ds-svc-row:hover svg { transform: translate(2px, -2px); } .ds-svc-row:focus-visible { outline: 2px solid oklch(0.546 0.215 263); outline-offset: 3px; }"
+    },
+    {
+      "name": "Chip de stack",
+      "kind": "chip",
+      "refersTo": "chip-stack",
+      "description": "Píldora informativa del stack de cada servicio en /servicios.",
+      "html": "<ul class=\"ds-chips\"><li class=\"ds-chip\">Next.js</li><li class=\"ds-chip\">React Native</li><li class=\"ds-chip\">PostgreSQL</li></ul>",
+      "css": ".ds-chips { font-family: var(--font-montserrat), Montserrat, ui-sans-serif, system-ui, sans-serif; display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; } .ds-chip { background: #fff; color: oklch(0.17 0.025 265); border: 1px solid oklch(0.929 0.013 255); border-radius: 9999px; padding: 4px 12px; font-size: 0.875rem; }"
+    },
+    {
+      "name": "Tarjeta de proyecto",
+      "kind": "card",
+      "refersTo": "card-project",
+      "description": "Escenario nocturno con escena de interfaz, métrica grande en azul señal y enlace al caso.",
+      "html": "<a class=\"ds-case\" href=\"#\"><div class=\"ds-case-stage\"><div class=\"ds-case-scene\"><b>Agenda</b><span>09:00 · Limpieza</span><span>10:30 · Control</span></div></div><div class=\"ds-case-body\"><p class=\"ds-case-metric\">+35%</p><p class=\"ds-case-label\">reservas online en 3 meses</p><p class=\"ds-case-sector\">Clínica dental</p><p class=\"ds-case-desc\">Sitio y agenda online con recordatorios automáticos.</p><span class=\"ds-case-open\">Ver el caso <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></span></div></a>",
+      "css": ".ds-case { font-family: var(--font-montserrat), Montserrat, ui-sans-serif, system-ui, sans-serif; display: flex; flex-direction: column; max-width: 360px; overflow: hidden; border-radius: 14px; border: 1px solid oklch(0.929 0.013 255); background: #fff; color: oklch(0.17 0.025 265); text-decoration: none; transition: border-color 0.3s, box-shadow 0.3s; } .ds-case-stage { display: flex; align-items: center; justify-content: center; min-height: 200px; padding: 24px; background: linear-gradient(180deg, oklch(0.17 0.025 265 / 0.85), oklch(0.17 0.025 265)); } .ds-case-scene { display: grid; gap: 6px; width: 70%; background: #fff; border-radius: 14px; padding: 16px; font-size: 0.75rem; box-shadow: 0 24px 48px -20px oklch(0.1 0.03 265 / 0.55); } .ds-case-scene span { background: oklch(0.546 0.215 263); color: #fff; border-radius: 6px; padding: 6px; font-weight: 600; } .ds-case-body { padding: 24px; } .ds-case-metric { margin: 0; font-size: 3rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; color: oklch(0.546 0.215 263); } .ds-case-label { margin: 8px 0 0; font-size: 0.875rem; font-weight: 600; } .ds-case-sector { margin: 20px 0 0; font-size: 0.875rem; font-weight: 600; color: oklch(0.446 0.037 257); } .ds-case-desc { margin: 4px 0 0; font-size: 0.875rem; line-height: 1.625; color: oklch(0.446 0.037 257); } .ds-case-open { display: inline-flex; align-items: center; gap: 6px; padding-top: 20px; font-size: 0.875rem; font-weight: 600; color: oklch(0.546 0.215 263); } .ds-case-open svg { transition: transform 0.3s ease-out; } .ds-case:hover { border-color: oklch(0.546 0.215 263 / 0.4); box-shadow: 0 18px 40px -20px oklch(0.546 0.215 263 / 0.45); } .ds-case:hover .ds-case-open svg { transform: translateX(2px); } .ds-case:focus-visible { outline: 2px solid oklch(0.546 0.215 263); outline-offset: 3px; }"
+    },
+    {
+      "name": "Cabecera y navegación",
+      "kind": "nav",
+      "refersTo": "header",
+      "description": "Banda noche fija de 64px con logo oficial, seis enlaces y \"Cotizar mi proyecto\".",
+      "html": "<header class=\"ds-header\"><span class=\"ds-header-logo\">ÁVILA SYSTEM</span><nav class=\"ds-header-nav\"><a href=\"#\">Servicios</a><a href=\"#\" aria-current=\"page\">Proyectos</a><a href=\"#\">Precios</a><a href=\"#\">Misión</a><a href=\"#\">Nosotros</a><a href=\"#\">Contacto</a></nav><a class=\"ds-header-cta\" href=\"#\">Cotizar mi proyecto <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></header>",
+      "css": ".ds-header { font-family: var(--font-montserrat), Montserrat, ui-sans-serif, system-ui, sans-serif; display: flex; align-items: center; justify-content: space-between; gap: 24px; height: 64px; padding: 0 24px; background: oklch(0.17 0.025 265); color: oklch(0.985 0.003 248); border-bottom: 1px solid oklch(0.3 0.035 265); } .ds-header-logo { font-weight: 700; letter-spacing: 0.08em; font-size: 0.875rem; } .ds-header-nav { display: flex; gap: 28px; } .ds-header-nav a { position: relative; padding: 8px 0; font-size: 0.875rem; font-weight: 500; color: oklch(0.78 0.03 257); text-decoration: none; transition: color 0.15s; } .ds-header-nav a:hover, .ds-header-nav a[aria-current=page] { color: oklch(0.985 0.003 248); } .ds-header-nav a[aria-current=page]::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 9999px; background: oklch(0.546 0.215 263); } .ds-header-cta { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 9999px; background: oklch(0.546 0.215 263); color: #fff; font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: background-color 0.15s; } .ds-header-cta svg { transition: transform 0.3s ease-out; } .ds-header-cta:hover { background: oklch(0.49 0.21 263); } .ds-header-cta:hover svg { transform: translateX(2px); } .ds-header a:focus-visible { outline: 2px solid oklch(0.546 0.215 263); outline-offset: 3px; }"
+    },
+    {
+      "name": "Cresta del Ávila",
+      "kind": "custom",
+      "refersTo": "band-night",
+      "description": "Elemento firma: la silueta del Ávila se traza al pie del cielo nocturno y se enciende la luz del Naiguatá.",
+      "html": "<section class=\"ds-ridge-hero\"><h2>Construimos el software que tu negocio usa todos los días.</h2><div class=\"ds-ridge-wrap\"><svg viewBox=\"0 0 1440 200\" preserveAspectRatio=\"none\" aria-hidden=\"true\"><path d=\"M0 168 L70 160 L150 150 L220 141 L290 128 L350 120 L410 108 L460 112 L515 94 L565 82 L612 66 L646 54 L672 70 L694 62 L722 44 L752 64 L800 78 L850 72 L905 56 L952 46 L1004 32 L1046 46 L1104 64 L1172 80 L1244 98 L1320 118 L1396 138 L1440 146 L1440 200 L0 200Z\" fill=\"oklch(0.12 0.02 265)\"/><path class=\"ds-ridge-line\" d=\"M0 168 L70 160 L150 150 L220 141 L290 128 L350 120 L410 108 L460 112 L515 94 L565 82 L612 66 L646 54 L672 70 L694 62 L722 44 L752 64 L800 78 L850 72 L905 56 L952 46 L1004 32 L1046 46 L1104 64 L1172 80 L1244 98 L1320 118 L1396 138 L1440 146\" fill=\"none\" stroke=\"oklch(0.68 0.17 258)\" stroke-width=\"1.5\" vector-effect=\"non-scaling-stroke\" pathLength=\"1\"/></svg><span class=\"ds-summit\" style=\"left:69.72%;top:16%\"></span></div></section>",
+      "css": ".ds-ridge-hero { font-family: var(--font-montserrat), Montserrat, ui-sans-serif, system-ui, sans-serif; position: relative; overflow: hidden; border-radius: 20px; padding: 40px 32px 140px; color: oklch(0.985 0.003 248); background: linear-gradient(180deg, oklch(0.15 0.022 265) 0%, oklch(0.17 0.025 265) 45%, oklch(0.24 0.05 262) 100%); } .ds-ridge-hero h2 { margin: 0; max-width: 15ch; font-size: 2.5rem; font-weight: 700; line-height: 1.04; letter-spacing: -0.025em; } .ds-ridge-wrap { position: absolute; left: 0; right: 0; bottom: 0; } .ds-ridge-wrap svg { display: block; width: 100%; height: 112px; } .ds-ridge-line { stroke-dasharray: 1; animation: ds-ridge-draw 2.4s cubic-bezier(0.65, 0, 0.35, 1) 0.2s both; } .ds-summit { position: absolute; width: 12px; height: 12px; border-radius: 9999px; background: oklch(0.92 0.06 240); box-shadow: 0 0 0 6px oklch(0.68 0.17 258 / 0.25), 0 0 24px 4px oklch(0.68 0.17 258 / 0.5); animation: ds-summit 0.8s cubic-bezier(0.16, 1, 0.3, 1) 2.3s both; } @keyframes ds-ridge-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } } @keyframes ds-summit { from { opacity: 0; transform: translate(-50%, -50%) scale(0.4); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } } @media (prefers-reduced-motion: reduce) { .ds-ridge-line, .ds-summit { animation-duration: 0.01ms; animation-delay: 0s; } }"
+    },
+    {
+      "name": "Panel de sprint",
+      "kind": "custom",
+      "refersTo": "sprint-panel",
+      "description": "Interfaz ilustrativa del hero: avance del proyecto con barras, entregables y mensaje de WhatsApp; se inclina con el cursor.",
+      "html": "<div class=\"ds-sprint-stage\"><div class=\"ds-sprint\"><div class=\"ds-sprint-head\"><b>App de reservas</b><span>Sprint 4 de 6</span></div><ol class=\"ds-sprint-bars\"><li><span class=\"ds-track\"><i style=\"width:100%\"></i></span>Descubrir</li><li><span class=\"ds-track\"><i style=\"width:100%\"></i></span>Prototipo</li><li><span class=\"ds-track\"><i class=\"ds-sprint-fill\" style=\"width:66%\"></i></span>Desarrollo</li><li class=\"ds-off\"><span class=\"ds-track\"><i style=\"width:0\"></i></span>Lanzar</li></ol><p class=\"ds-sprint-next\">Demo en vivo · viernes 10:00</p></div></div>",
+      "css": ".ds-sprint-stage { font-family: var(--font-montserrat), Montserrat, ui-sans-serif, system-ui, sans-serif; background: oklch(0.17 0.025 265); padding: 32px; border-radius: 14px; perspective: 1400px; } .ds-sprint { max-width: 420px; background: #fff; color: oklch(0.17 0.025 265); border-radius: 18px; padding: 24px; box-shadow: 0 30px 60px -24px oklch(0.05 0.03 265 / 0.8); transition: transform 0.5s ease-out; } .ds-sprint-stage:hover .ds-sprint { transform: rotateX(-2deg) rotateY(4deg); } .ds-sprint-head { display: flex; justify-content: space-between; align-items: baseline; } .ds-sprint-head span { font-size: 0.75rem; font-weight: 600; color: oklch(0.546 0.215 263); font-variant-numeric: tabular-nums; } .ds-sprint-bars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; list-style: none; margin: 20px 0 0; padding: 0; font-size: 0.75rem; font-weight: 600; } .ds-track { display: block; height: 6px; margin-bottom: 8px; overflow: hidden; border-radius: 9999px; background: oklch(0.929 0.013 255); } .ds-track i { display: block; height: 100%; border-radius: 9999px; background: oklch(0.546 0.215 263); } .ds-off { font-weight: 400; color: oklch(0.446 0.037 257); } .ds-sprint-fill { animation: ds-fill 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both; } .ds-sprint-next { margin: 20px 0 0; padding-top: 16px; border-top: 1px solid oklch(0.929 0.013 255); text-align: right; font-size: 0.75rem; font-weight: 600; color: oklch(0.446 0.037 257); } @keyframes ds-fill { from { width: 8%; } } @media (prefers-reduced-motion: reduce) { .ds-sprint-fill { animation-duration: 0.01ms; animation-delay: 0s; } .ds-sprint { transition: none; } .ds-sprint-stage:hover .ds-sprint { transform: none; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "La Cumbre de Noche",
+    "overview": "Avila System se presenta como ingeniería seria con alcance: la marca es una cumbre, el Ávila, vista de noche desde Caracas. El sitio alterna superficies de azul noche con planos claros, como un producto real alterna su consola y su documentación. Lo oscuro enmarca los momentos de identidad y decisión (cabecera, hero, proceso, cierre, pie, 404); lo claro carga el contenido que se lee y se compara (servicios, proyectos, testimonios).\n\nEl elemento firma es la cresta del Ávila (`components/brand/ridge.tsx`): una silueta real de oeste a este, con la Silla y el Naiguatá como cumbre más alta. Recorre el sitio como un ascenso: en el hero se traza y se enciende la luz de la cumbre; en los heros internos se traza y su relleno es el papel claro de la página que sigue; en la banda de proceso se convierte en un perfil de subida con cinco paradas que avanza con el scroll; en el cierre vuelve con la cumbre encendida; en el 404 es el sendero que no lleva a ninguna parte. La densidad es media y ordenada: contenedor de 1280px, columnas asimétricas, un único acento saturado (azul señal) y piezas de interfaz ilustrativas que se mueven solo cuando hay algo que contar.\n\nRechazos confirmados por la marca: nada de gradientes de texto, blobs ni glass; nada de etiquetas eyebrow sobre los títulos.",
+    "keyCharacteristics": [
+      "Ritmo: cielo nocturno con cresta → servicios en claro → banda de ascenso → proyectos en claro → testimonios → banda de cierre con cumbre → pie noche.",
+      "La cresta del Ávila como único recurso decorativo, siempre anclada al borde inferior de una superficie oscura.",
+      "Un solo acento saturado (azul señal) para acciones y cifras; azul cumbre solo como luz (trazo de la cresta, recorrido, halos).",
+      "Montserrat en 700 para titulares con tracking negativo y sin palabra resaltada; 400 para el cuerpo.",
+      "Un único verbo de conversión, \"Cotizar mi proyecto\", con WhatsApp (glifo oficial) como segunda vía.",
+      "Interfaces ilustrativas que cuentan el resultado: panel de sprint que se inclina con el cursor, escenas de proyecto que se reproducen al entrar en pantalla."
+    ],
+    "rules": [
+      {
+        "name": "La Regla de la Señal Única",
+        "body": "El azul señal es el único color saturado propio del sistema y significa \"acción\" o \"dato confirmado\". No se usa como fondo de sección ni como decoración.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla del Verde Prestado",
+        "body": "El verde WhatsApp solo aparece en el glifo oficial (`WhatsAppIcon`) y en el botón flotante. Nunca como acento, estado de éxito de la UI ni fondo.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla de la Banda Oscura",
+        "body": "Las superficies oscuras se crean con `className=\"dark\"` sobre la sección, nunca pintando colores de noche a mano; así los tokens cambian juntos.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla del Titular Firme",
+        "body": "Todo h1–h3 lleva 700 (o 600 en títulos de fila), tracking −0.025em y balance de líneas. Nada de titulares en peso ligero.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla del Titular Sin Destacado",
+        "body": "Los titulares van en un solo color. Ninguna palabra se pinta en azul cumbre ni en azul señal; el énfasis lo pone la cresta, no el texto.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla de las Cifras Tabulares",
+        "body": "Métricas, cifras del hero, numerales del proceso y horas de las escenas usan `tabular-nums`.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla de la Elevación Única",
+        "body": "Una tarjeta o fila de contenido tiene exactamente un nivel de elevación y solo aparece como respuesta al hover. Nunca sombra en reposo ni sombras apiladas; la excepción son los objetos de interfaz ilustrativa sobre noche.",
+        "section": "elevation"
+      },
+      {
+        "name": "La Regla de la Cresta Única",
+        "body": "La única geometría decorativa es la cresta del Ávila (`Ridge`), siempre en el borde inferior de una superficie oscura. Nada de círculos decorativos, blobs, mallas ni planos de montaña inventados; la luz de la cumbre solo marca el Naiguatá en el hero y el cierre.",
+        "section": "shapes"
+      },
+      {
+        "name": "La Regla del Cielo Nocturno",
+        "body": "El único degradado de fondo es el vertical de cielo nocturno (de noche profunda a horizonte) en hero, heros internos, 404 y cierre, más el velo nocturno sobre las fotos de proyectos. Ningún otro degradado de color, radial ni de texto.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** crear las superficies oscuras con `className=\"dark\"` sobre la sección para que los tokens cambien en bloque.",
+      "**Do** cerrar toda superficie oscura de identidad (hero, heros internos, cierre, 404) con la cresta del Ávila en su borde inferior.",
+      "**Do** usar \"Cotizar mi proyecto\" con flecha como único CTA primario, y WhatsApp con su glifo oficial como segunda vía.",
+      "**Do** marcar cada botón de WhatsApp en línea con `data-wa-inline`.",
+      "**Do** declarar como ilustrativas las interfaces y acreditar las fotos de contexto.",
+      "**Do** mostrar cifras con `tabular-nums` y solo las confirmadas en PRODUCT.md.",
+      "**Do** respetar `prefers-reduced-motion`: toda animación y transición se reduce a ~0, el ascenso queda completo y el panel no se inclina.",
+      "**Do** dejar que las animaciones de carga funcionen desde CSS, sin depender de la hidratación."
+    ],
+    "donts": [
+      "**Don't** usar gradientes de texto, blobs, glass ni degradados de fondo distintos del cielo nocturno.",
+      "**Don't** poner etiquetas eyebrow sobre los títulos.",
+      "**Don't** resaltar palabras de un titular en otro color.",
+      "**Don't** dar sombra en reposo a tarjetas o filas de contenido ni apilar más de un nivel de elevación.",
+      "**Don't** introducir un segundo color saturado propio: el azul señal es la única voz de acción y el verde WhatsApp solo vive en su glifo.",
+      "**Don't** usar círculos, curvas o montañas decorativas distintas de la cresta del Ávila.",
+      "**Don't** usar titulares en peso ligero ni tracking positivo fuera del logotipo."
+    ]
+  }
+}

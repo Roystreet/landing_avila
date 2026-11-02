@@ -4,81 +4,83 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Light mode — white background with gold accents */
-  --background: oklch(1 0 0);                /* #FFFFFF */
-  --foreground: oklch(0.15 0 0);             /* #111111 */
-  --card: oklch(0.985 0 0);                  /* near-white surface */
-  --card-foreground: oklch(0.15 0 0);
+  /* Planos claros — base del sitio (Avila System, rebrand azul) */
+  --background: oklch(0.984 0.003 248);      /* #F8FAFC */
+  --foreground: oklch(0.17 0.025 265);       /* #0B0F1A tinta */
+  --card: oklch(1 0 0);                      /* #FFFFFF */
+  --card-foreground: oklch(0.17 0.025 265);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0 0);
-  --primary: oklch(0.62 0.15 75);            /* darker gold for contrast on white */
+  --popover-foreground: oklch(0.17 0.025 265);
+  --primary: oklch(0.546 0.215 263);         /* #2563EB azul señal */
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.58 0.18 45);          /* warm orange */
-  --secondary-foreground: oklch(1 0 0);
-  --muted: oklch(0.96 0 0);                  /* #F5F5F5 */
-  --muted-foreground: oklch(0.45 0 0);       /* #737373 */
-  --accent: oklch(0.68 0.15 65);
+  --primary-hover: oklch(0.49 0.21 263);
+  --secondary: oklch(0.955 0.01 255);        /* #EEF2F7 */
+  --secondary-foreground: oklch(0.17 0.025 265);
+  --muted: oklch(0.955 0.01 255);
+  --muted-foreground: oklch(0.446 0.037 257); /* #475569 */
+  --accent: oklch(0.546 0.215 263);          /* texto destacado sobre claro */
   --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.55 0.2 27);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.9 0 0);                  /* #E5E5E5 */
-  --input: oklch(0.98 0 0);
-  --ring: oklch(0.62 0.15 75 / 0.5);
-  --chart-1: oklch(0.62 0.15 75);
-  --chart-2: oklch(0.58 0.18 45);
-  --chart-3: oklch(0.68 0.15 65);
-  --chart-4: oklch(0.55 0.2 27);
-  --chart-5: oklch(0.78 0.12 85);
-  --radius: 0.5rem;
-  --sidebar: oklch(0.98 0 0);
-  --sidebar-foreground: oklch(0.15 0 0);
-  --sidebar-primary: oklch(0.62 0.15 75);
+  --border: oklch(0.929 0.013 255);          /* #E2E8F0 */
+  --input: oklch(0.929 0.013 255);
+  --ring: oklch(0.546 0.215 263 / 0.45);
+  --slate: oklch(0.711 0.035 257);           /* #94A3B8 */
+  --night: oklch(0.17 0.025 265);            /* #0B0F1A */
+  --night-raised: oklch(0.215 0.03 265);     /* #131A2A */
+  --chart-1: oklch(0.546 0.215 263);
+  --chart-2: oklch(0.711 0.035 257);
+  --chart-3: oklch(0.68 0.17 258);
+  --chart-4: oklch(0.446 0.037 257);
+  --chart-5: oklch(0.85 0.06 258);
+  --radius: 0.875rem;                        /* 14px */
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.17 0.025 265);
+  --sidebar-primary: oklch(0.546 0.215 263);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.68 0.15 65);
-  --sidebar-accent-foreground: oklch(1 0 0);
-  --sidebar-border: oklch(0.9 0 0);
-  --sidebar-ring: oklch(0.62 0.15 75 / 0.5);
+  --sidebar-accent: oklch(0.955 0.01 255);
+  --sidebar-accent-foreground: oklch(0.17 0.025 265);
+  --sidebar-border: oklch(0.929 0.013 255);
+  --sidebar-ring: oklch(0.546 0.215 263 / 0.45);
 }
 
+/* Bandas de azul noche: se aplica con className="dark" en una sección */
 .dark {
-  /* Dark mode — Avila System brand palette: black + gold */
-  --background: oklch(0.145 0 0);            /* #0A0A0A */
-  --foreground: oklch(1 0 0);                /* #FFFFFF */
-  --card: oklch(0.205 0 0);                  /* #171717 */
-  --card-foreground: oklch(1 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(1 0 0);
-  --primary: oklch(0.75 0.15 75);            /* #E0A419 gold */
-  --primary-foreground: oklch(0.145 0 0);
-  --secondary: oklch(0.65 0.18 45);
-  --secondary-foreground: oklch(1 0 0);
-  --muted: oklch(0.205 0 0);
-  --muted-foreground: oklch(0.7 0 0);        /* #A1A1A1 */
-  --accent: oklch(0.78 0.15 65);
-  --accent-foreground: oklch(0.145 0 0);
-  --destructive: oklch(0.45 0.18 27);
+  --background: oklch(0.17 0.025 265);       /* #0B0F1A */
+  --foreground: oklch(0.985 0.003 248);
+  --card: oklch(0.215 0.03 265);             /* #131A2A */
+  --card-foreground: oklch(0.985 0.003 248);
+  --popover: oklch(0.215 0.03 265);
+  --popover-foreground: oklch(0.985 0.003 248);
+  --primary: oklch(0.546 0.215 263);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.25 0.03 265);
+  --secondary-foreground: oklch(0.985 0.003 248);
+  --muted: oklch(0.25 0.03 265);
+  --muted-foreground: oklch(0.78 0.03 257);  /* pizarra legible sobre noche */
+  --accent: oklch(0.68 0.17 258);            /* #4F8CFF texto destacado sobre noche */
+  --accent-foreground: oklch(0.17 0.025 265);
+  --destructive: oklch(0.6 0.2 27);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.27 0 0);                 /* #262626 */
-  --input: oklch(0.205 0 0);
-  --ring: oklch(0.75 0.15 75 / 0.5);
-  --chart-1: oklch(0.75 0.15 75);
-  --chart-2: oklch(0.65 0.18 45);
-  --chart-3: oklch(0.78 0.15 65);
-  --chart-4: oklch(0.45 0.18 27);
-  --chart-5: oklch(0.85 0.12 85);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(0.75 0.15 75);
-  --sidebar-primary-foreground: oklch(0.145 0 0);
-  --sidebar-accent: oklch(0.78 0.15 65);
-  --sidebar-accent-foreground: oklch(0.145 0 0);
-  --sidebar-border: oklch(0.27 0 0);
-  --sidebar-ring: oklch(0.75 0.15 75 / 0.5);
+  --border: oklch(0.3 0.035 265);            /* #232C40 */
+  --input: oklch(0.25 0.03 265);
+  --ring: oklch(0.68 0.17 258 / 0.55);
+  --sidebar: oklch(0.215 0.03 265);
+  --sidebar-foreground: oklch(0.985 0.003 248);
+  --sidebar-primary: oklch(0.546 0.215 263);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.25 0.03 265);
+  --sidebar-accent-foreground: oklch(0.985 0.003 248);
+  --sidebar-border: oklch(0.3 0.035 265);
+  --sidebar-ring: oklch(0.68 0.17 258 / 0.55);
 }
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-slate-brand: var(--slate);
+  --color-night: var(--night);
+  --color-night-raised: var(--night-raised);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -122,6 +124,153 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    letter-spacing: -0.025em;
+  }
+  ::selection {
+    background: oklch(0.546 0.215 263 / 0.22);
+    color: inherit;
+  }
+  html {
+    accent-color: var(--primary);
+    scrollbar-color: oklch(0.711 0.035 257) transparent;
+  }
+  a {
+    text-underline-offset: 0.2em;
+  }
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Cresta del Ávila: se traza al cargar el hero */
+@keyframes ridge-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+.ridge-draw {
+  stroke-dasharray: 1;
+  animation: ridge-draw 2.4s cubic-bezier(0.65, 0, 0.35, 1) 0.2s both;
+}
+@keyframes summit-light {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+.summit-light {
+  animation: summit-light 0.8s cubic-bezier(0.16, 1, 0.3, 1) 2.3s both;
+}
+
+/* Escenas de proyectos: sin JS se ve el estado final; con JS esperan a entrar en pantalla */
+.scene[data-play="false"] :is(.scene-pop, .scene-slide, .scene-stop, .scene-success) {
+  opacity: 0;
+}
+.scene[data-play="false"] .scene-route {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+@keyframes scene-pop {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes scene-slide {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scene-route {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes scene-press {
+  0% { transform: scale(1); opacity: 1; }
+  45% { transform: scale(0.94); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+@keyframes scene-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.scene[data-play="true"] .scene-pop {
+  animation: scene-pop 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.scene[data-play="true"] .scene-slide {
+  animation: scene-slide 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.scene[data-play="true"] .scene-stop {
+  animation: scene-pop 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.scene[data-play="true"] .scene-route {
+  stroke-dasharray: 1;
+  animation: scene-route 2s cubic-bezier(0.65, 0, 0.35, 1) 0.4s both;
+}
+.scene .scene-press {
+  opacity: 0;
+}
+.scene[data-play="false"] .scene-press {
+  opacity: 1;
+}
+.scene[data-play="true"] .scene-press {
+  animation: scene-press 0.55s ease-out 1.4s both;
+}
+.scene[data-play="true"] .scene-success {
+  animation: scene-fade 0.35s ease-out 1.85s both;
+}
+
+/* Panel de sprint del hero: entra al pintar, sin depender de JS */
+@keyframes sprint-fill {
+  from { width: 8%; }
+}
+.sprint-fill {
+  animation: sprint-fill 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+}
+.sprint-item {
+  animation: scene-slide 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.sprint-message {
+  animation: scene-slide 0.6s cubic-bezier(0.16, 1, 0.3, 1) 2.2s both;
+}
+
+/* Barras que crecen en la escena del dashboard */
+@keyframes scene-grow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+.scene .scene-grow {
+  transform-origin: bottom;
+}
+.scene[data-play="false"] .scene-grow {
+  transform: scaleY(0);
+}
+.scene[data-play="true"] .scene-grow {
+  animation: scene-grow 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Foto de referencia del caso: se acerca suavemente mientras cruza la pantalla (si el navegador lo soporta) */
+@supports (animation-timeline: view()) {
+  @keyframes case-photo-zoom {
+    from { transform: scale(1.12); }
+    to { transform: scale(1); }
+  }
+  .case-photo {
+    animation: case-photo-zoom linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 60%;
   }
 }

@@ -1,23 +1,10 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import {
-  Compass,
-  Telescope,
-  Gem,
-  Search,
-  PenTool,
-  Hammer,
-  Rocket,
-  LineChart,
-  ArrowRight,
-} from "lucide-react"
+import { ArrowRight, Compass, Gem, Telescope } from "lucide-react"
 import { useLanguage } from "@/components/providers/language-provider"
 
 const copy = {
   es: {
-    eyebrow: "Lo que hacemos y cómo",
     title: "Ingeniería de software",
     titleHighlight: "sin humo",
     intro:
@@ -67,39 +54,8 @@ const copy = {
       "Agentes de IA y automatización",
       "Integraciones y APIs",
     ],
-    processEyebrow: "Nuestro proceso",
-    processTitle: "De la idea al producto en 5 etapas",
-    processSubtitle: "Un flujo repetible que aplicamos en todos los proyectos, ajustado a la escala de cada cliente.",
-    process: [
-      {
-        title: "Descubrimos",
-        description:
-          "Mapeamos el problema, los usuarios y las restricciones. Salimos con un alcance, una arquitectura propuesta y un estimado fundamentado.",
-      },
-      {
-        title: "Diseñamos",
-        description:
-          "Prototipos navegables, flujos de usuario y definición técnica. Alineamos expectativas antes de invertir en desarrollo.",
-      },
-      {
-        title: "Construimos",
-        description:
-          "Sprints de 2 semanas con demos en vivo. Código revisado por pares, tests automatizados y despliegues continuos en ambiente de staging.",
-      },
-      {
-        title: "Lanzamos",
-        description:
-          "Puesta en producción con monitoreo, alertas y checklist de rollback. Acompañamos el hypercare de las primeras semanas.",
-      },
-      {
-        title: "Evolucionamos",
-        description:
-          "Soporte, optimización y nuevas iteraciones según los datos reales de uso. El software no se termina: se mejora.",
-      },
-    ],
   },
   en: {
-    eyebrow: "What we do and how",
     title: "Software engineering",
     titleHighlight: "without fluff",
     intro:
@@ -149,37 +105,6 @@ const copy = {
       "AI agents and automation",
       "Integrations and APIs",
     ],
-    processEyebrow: "Our process",
-    processTitle: "From idea to product in 5 stages",
-    processSubtitle:
-      "A repeatable flow we apply to every project, scaled to each client's needs.",
-    process: [
-      {
-        title: "Discover",
-        description:
-          "We map the problem, users and constraints. We come out with scope, a proposed architecture and a well-founded estimate.",
-      },
-      {
-        title: "Design",
-        description:
-          "Clickable prototypes, user flows and technical definition. We align expectations before investing in development.",
-      },
-      {
-        title: "Build",
-        description:
-          "Two-week sprints with live demos. Peer-reviewed code, automated tests and continuous deployments to staging.",
-      },
-      {
-        title: "Launch",
-        description:
-          "Production rollout with monitoring, alerts and a rollback checklist. We stay with you through the first-weeks hypercare.",
-      },
-      {
-        title: "Evolve",
-        description:
-          "Support, optimization and new iterations based on real usage data. Software isn't finished — it's improved.",
-      },
-    ],
   },
 }
 
@@ -188,100 +113,56 @@ export default function MissionSection() {
   const t = copy[lang]
 
   const pillarIcons = [Compass, Telescope, Gem]
-  const processIcons = [Search, PenTool, Hammer, Rocket, LineChart]
 
   return (
-    <section id="mision" className="py-20 bg-gradient-to-b from-background via-muted/20 to-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">{t.eyebrow}</Badge>
-          <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4 text-balance">
-            {t.title} <span className="text-primary">{t.titleHighlight}</span>
+    <section id="mision" className="bg-background py-16 md:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl">
+          <h2 className="text-3xl font-bold leading-tight md:text-5xl">
+            {t.title} {t.titleHighlight}
           </h2>
-          <p className="text-lg text-muted-foreground text-pretty">{t.intro}</p>
+          <p className="mt-5 text-lg leading-relaxed text-muted-foreground">{t.intro}</p>
         </div>
 
-        {/* Pillars */}
-        <div className="grid lg:grid-cols-3 gap-6 mb-20">
+        <div className="mt-14 grid border-t border-foreground/80 lg:grid-cols-3">
           {t.pillars.map((item, index) => {
             const Icon = pillarIcons[index]
             return (
-              <Card
-                key={index}
-                className="bg-card border-border hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 group relative overflow-hidden"
+              <div
+                key={item.eyebrow}
+                className={`pt-8 lg:px-8 lg:pb-2 ${index === 0 ? "lg:pl-0" : "lg:border-l lg:border-border"} ${index === 2 ? "lg:pr-0" : ""} ${index > 0 ? "mt-10 lg:mt-0" : ""}`}
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-500" />
-                <CardContent className="p-8 relative">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 group-hover:border-primary/40 transition-all duration-300">
-                      <Icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <span className="text-xs uppercase tracking-widest text-primary font-semibold">{item.eyebrow}</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-card-foreground mb-3 leading-snug">{item.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed mb-5 text-sm">{item.description}</p>
-                  <ul className="space-y-2 border-t border-border pt-4">
-                    {item.highlights.map((h, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <ArrowRight className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                        <span>{h}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
+                <h3 className="flex items-center gap-3 text-2xl font-bold">
+                  <Icon className="h-6 w-6 text-primary" strokeWidth={1.5} aria-hidden="true" />
+                  {item.eyebrow}
+                </h3>
+                <p className="mt-4 text-lg font-semibold leading-snug">{item.title}</p>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
+                <ul className="mt-6 space-y-2.5 border-t border-border pt-5">
+                  {item.highlights.map((h) => (
+                    <li key={h} className="flex items-start gap-2.5 text-sm">
+                      <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                      <span>{h}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )
           })}
         </div>
 
-        {/* Capabilities strip */}
-        <div className="mb-20">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{t.capabilitiesTitle}</h3>
-            <p className="text-muted-foreground">{t.capabilitiesSubtitle}</p>
+        <div className="mt-20 grid gap-6 border-t border-border pt-12 lg:grid-cols-[1fr_2fr] lg:items-start">
+          <div>
+            <h2 className="text-2xl font-bold md:text-3xl">{t.capabilitiesTitle}</h2>
+            <p className="mt-2 text-muted-foreground">{t.capabilitiesSubtitle}</p>
           </div>
-          <div className="flex flex-wrap justify-center gap-3">
-            {t.capabilities.map((cap, i) => (
-              <div
-                key={i}
-                className="px-5 py-3 bg-card border border-border rounded-full hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 cursor-default"
-              >
-                <span className="text-sm text-card-foreground font-medium">{cap}</span>
-              </div>
+          <ul className="flex flex-wrap gap-2.5">
+            {t.capabilities.map((cap) => (
+              <li key={cap} className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium">
+                {cap}
+              </li>
             ))}
-          </div>
-        </div>
-
-        {/* Process timeline */}
-        <div>
-          <div className="text-center mb-12">
-            <Badge className="mb-4 bg-accent/10 text-accent border-accent/20">{t.processEyebrow}</Badge>
-            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{t.processTitle}</h3>
-            <p className="text-muted-foreground max-w-2xl mx-auto">{t.processSubtitle}</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4 relative">
-            {t.process.map((p, i) => {
-              const Icon = processIcons[i]
-              return (
-                <div
-                  key={i}
-                  className="relative bg-card border border-border rounded-lg p-6 hover:border-primary/40 transition-all duration-300 group"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-3xl font-bold text-primary/30 group-hover:text-primary/60 transition-colors">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <Icon className="h-5 w-5 text-primary" />
-                    </div>
-                  </div>
-                  <h4 className="font-semibold text-card-foreground mb-2">{p.title}</h4>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{p.description}</p>
-                </div>
-              )
-            })}
-          </div>
+          </ul>
         </div>
       </div>
     </section>

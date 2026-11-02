@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="s" gradientUnits="userSpaceOnUse" x1="280" y1="79" x2="370" y2="222">
+      <stop offset="0" stop-color="#F8FAFC"/><stop offset="0.38" stop-color="#E3E8EF"/><stop offset="0.76" stop-color="#A3AEBC"/><stop offset="1" stop-color="#75859B"/>
+    </linearGradient>
+    <linearGradient id="b" gradientUnits="userSpaceOnUse" x1="310" y1="184" x2="409" y2="222">
+      <stop offset="0" stop-color="#2563EB" stop-opacity="0"/><stop offset="0.55" stop-color="#2563EB" stop-opacity="0"/><stop offset="0.83" stop-color="#2563EB" stop-opacity="0.42"/><stop offset="1" stop-color="#06B6D4"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="#0B0F1A"/>
+  <g transform="translate(-221.7 -37.4) scale(1.1)">
+    <path fill="url(#s)" d="M227 206 L308.8 82.6 C310.2 80.3 311.6 79 314 79 H317 C319.3 79 320.7 80.5 322.1 82.7 L409 222 L306 191 C319 191.8 342 201.1 362 207 L325 143 C322.4 137.9 320.1 135.8 316.2 139.2 C290 162.9 258.4 185.2 227 206 Z"/>
+    <path fill="url(#b)" d="M227 206 L308.8 82.6 C310.2 80.3 311.6 79 314 79 H317 C319.3 79 320.7 80.5 322.1 82.7 L409 222 L306 191 C319 191.8 342 201.1 362 207 L325 143 C322.4 137.9 320.1 135.8 316.2 139.2 C290 162.9 258.4 185.2 227 206 Z"/>
+  </g>
+</svg>

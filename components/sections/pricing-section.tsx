@@ -1,9 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import {
   Check,
   Globe,
@@ -590,130 +587,103 @@ export default function PricingSection() {
   const current = t.categories.find((c) => c.id === active) ?? t.categories[0]
 
   return (
-    <section id="precios" className="py-20 bg-background relative overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-40 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 -right-40 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
-      </div>
-
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div className="text-center mb-12 max-w-3xl mx-auto">
-          <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">{t.badge}</Badge>
-          <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4 text-balance">
-            {t.title} <span className="text-primary">{t.titleHighlight}</span>
+    <section id="precios" className="bg-background py-16 md:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl">
+          <h2 className="text-3xl font-bold leading-tight md:text-5xl">
+            {t.title} {t.titleHighlight}
           </h2>
-          <p className="text-lg text-muted-foreground text-pretty">{t.intro}</p>
+          <p className="mt-5 text-lg leading-relaxed text-muted-foreground">{t.intro}</p>
         </div>
 
-        {/* Category tabs */}
-        <div className="flex flex-wrap justify-center gap-2 mb-10">
+        <div role="tablist" aria-label={t.title} className="mt-12 flex flex-wrap gap-2">
           {t.categories.map((cat) => {
             const isActive = cat.id === active
             return (
               <button
                 key={cat.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
                 onClick={() => setActive(cat.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all duration-300 ${
+                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition-colors ${
                   isActive
-                    ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20"
-                    : "bg-card text-card-foreground border-border hover:border-primary/50 hover:bg-primary/5"
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border bg-card hover:border-primary/40"
                 }`}
               >
-                <cat.icon className="h-4 w-4" />
-                <span className="text-sm font-medium">{cat.label}</span>
+                <cat.icon className="h-4 w-4" aria-hidden="true" />
+                {cat.label}
               </button>
             )
           })}
         </div>
+        <p className="mt-5 max-w-2xl text-muted-foreground">{current.description}</p>
 
-        {/* Category description */}
-        <p className="text-center text-muted-foreground mb-10 max-w-2xl mx-auto">{current.description}</p>
-
-        {/* Tiers */}
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div role="tabpanel" className="mt-10 grid gap-5 md:grid-cols-3">
           {current.tiers.map((tier) => (
-            <Card
+            <div
               key={`${current.id}-${tier.name}`}
-              className={`relative transition-all duration-500 hover:scale-[1.02] ${
+              className={`flex flex-col rounded-[14px] border p-7 md:p-8 ${
                 tier.featured
-                  ? "bg-gradient-to-b from-primary/10 to-card border-primary/50 shadow-2xl shadow-primary/10 md:-translate-y-2"
-                  : "bg-card border-border hover:border-primary/30"
+                  ? "dark border-transparent bg-background text-foreground shadow-[0_24px_48px_-24px_oklch(0.17_0.025_265/0.6)]"
+                  : "border-border bg-card"
               }`}
             >
-              {tier.featured && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <Badge className="bg-primary text-primary-foreground border-primary px-3 py-1">
-                    <Sparkles className="h-3 w-3 mr-1" />
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="text-2xl font-bold">{tier.name}</h3>
+                {tier.featured && (
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
+                    <Sparkles className="h-3 w-3" aria-hidden="true" />
                     {t.popular}
-                  </Badge>
-                </div>
-              )}
-              <CardContent className="p-8">
-                <div className="mb-6">
-                  <h3 className="text-2xl font-bold text-card-foreground mb-1">{tier.name}</h3>
-                  <p className="text-sm text-muted-foreground">{tier.tagline}</p>
-                </div>
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-sm text-muted-foreground">{tier.tagline}</p>
 
-                <div className="mb-6 pb-6 border-b border-border">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-xs text-muted-foreground">{t.fromLabel}</span>
-                  </div>
-                  <div className="flex items-baseline gap-1">
-                    <span
-                      className={`text-4xl font-bold ${tier.featured ? "text-primary" : "text-card-foreground"}`}
-                    >
-                      {tier.price}
-                    </span>
-                    {tier.unit && <span className="text-muted-foreground text-sm">{tier.unit}</span>}
-                    {!tier.unit && <span className="text-muted-foreground text-sm">USD</span>}
-                  </div>
-                </div>
+              <div className="mt-6 border-b border-border pb-6">
+                <p className="text-xs text-muted-foreground">{t.fromLabel}</p>
+                <p className="mt-1 flex items-baseline gap-1.5">
+                  <span className={`text-4xl font-bold tabular-nums ${tier.featured ? "text-accent" : ""}`}>{tier.price}</span>
+                  <span className="text-sm text-muted-foreground">{tier.unit ?? "USD"}</span>
+                </p>
+              </div>
 
-                <ul className="space-y-3 mb-8">
-                  {tier.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm">
-                      <div
-                        className={`mt-0.5 h-5 w-5 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          tier.featured ? "bg-primary/20" : "bg-primary/10"
-                        }`}
-                      >
-                        <Check className="h-3 w-3 text-primary" />
-                      </div>
-                      <span className="text-muted-foreground">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+              <ul className="mt-6 flex-1 space-y-3">
+                {tier.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-2.5 text-sm">
+                    <Check className={`mt-0.5 h-4 w-4 shrink-0 ${tier.featured ? "text-accent" : "text-primary"}`} aria-hidden="true" />
+                    <span className={tier.featured ? "" : "text-muted-foreground"}>{feature}</span>
+                  </li>
+                ))}
+              </ul>
 
-                <Link href="#cotizacion">
-                  <Button
-                    className={`w-full group ${
-                      tier.featured
-                        ? "bg-primary hover:bg-primary/90 text-primary-foreground"
-                        : "bg-card-foreground/5 hover:bg-primary hover:text-primary-foreground text-card-foreground border border-border"
-                    } transition-all duration-300`}
-                  >
-                    {t.requestPlan}
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+              <Link
+                href="#cotizacion"
+                className={`group inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-colors ${
+                  tier.featured
+                    ? "mt-8 bg-primary text-primary-foreground hover:bg-[var(--primary-hover)]"
+                    : "mt-8 border border-border hover:border-primary hover:text-primary"
+                }`}
+              >
+                {t.requestPlan}
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5" aria-hidden="true" />
+              </Link>
+            </div>
           ))}
         </div>
 
-        {/* Custom CTA */}
-        <div className="mt-16 max-w-3xl mx-auto text-center p-8 bg-card border border-border rounded-lg">
-          <h3 className="text-xl font-semibold text-card-foreground mb-2">{t.customTitle}</h3>
-          <p className="text-muted-foreground mb-6">{t.customDesc}</p>
-          <Link href="#cotizacion">
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 group"
-            >
-              {t.customCta}
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-            </Button>
+        <div className="mt-14 flex flex-col gap-6 border-t border-border pt-10 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h3 className="text-xl font-bold">{t.customTitle}</h3>
+            <p className="mt-2 max-w-xl text-muted-foreground">{t.customDesc}</p>
+          </div>
+          <Link
+            href="#cotizacion"
+            className="group inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-[var(--primary-hover)] md:self-auto"
+          >
+            {t.customCta}
+            <ArrowRight className="h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5" aria-hidden="true" />
           </Link>
         </div>
       </div>

@@ -1,7 +1,5 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Code, Smartphone, Cloud, Database, Shield, Brain } from "lucide-react"
 import { useLanguage } from "@/components/providers/language-provider"
 
@@ -83,6 +81,7 @@ const copy = {
 }
 
 const icons = [Code, Smartphone, Cloud, Database, Shield, Brain]
+const anchors = ["web", "movil", "cloud", "sistemas", "seguridad", "ia"]
 const techStacks = [
   ["React", "Next.js", "TypeScript", "Vercel"],
   ["React Native", "Flutter", "Swift", "Kotlin"],
@@ -97,46 +96,33 @@ export default function ServicesSection() {
   const t = copy[lang]
 
   return (
-    <section id="servicios" className="py-20 bg-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{t.heading}</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t.subheading}</p>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <section id="servicios" className="bg-background py-16 md:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <ul className="border-b border-border">
           {t.services.map((service, index) => {
             const Icon = icons[index]
             return (
-              <Card
-                key={index}
-                className="bg-card border-border hover:shadow-2xl transition-all duration-500 hover:scale-105 group overflow-hidden"
+              <li
+                key={service.title}
+                id={anchors[index]}
+                className="grid scroll-mt-24 gap-4 border-t border-border py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)_minmax(0,1fr)] md:gap-10 md:py-10"
               >
-                <CardHeader>
-                  <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 transition-all duration-300 group-hover:scale-110 group-hover:rotate-12">
-                    <Icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <CardTitle className="text-card-foreground group-hover:text-primary transition-colors duration-300">
-                    {service.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-muted-foreground mb-4">{service.description}</CardDescription>
-                  <div className="flex flex-wrap gap-2">
-                    {techStacks[index].map((tech, techIndex) => (
-                      <Badge
-                        key={techIndex}
-                        variant="secondary"
-                        className="text-xs bg-primary/10 text-primary border-primary/20"
-                      >
-                        {tech}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                <div className="flex items-center gap-4">
+                  <Icon className="h-7 w-7 shrink-0 text-primary" strokeWidth={1.5} aria-hidden="true" />
+                  <h2 className="text-xl font-bold md:text-2xl">{service.title}</h2>
+                </div>
+                <p className="text-base leading-relaxed text-muted-foreground">{service.description}</p>
+                <ul className="flex flex-wrap content-start gap-2" aria-label="Stack">
+                  {techStacks[index].map((tech) => (
+                    <li key={tech} className="rounded-full border border-border bg-card px-3 py-1 text-sm">
+                      {tech}
+                    </li>
+                  ))}
+                </ul>
+              </li>
             )
           })}
-        </div>
+        </ul>
       </div>
     </section>
   )

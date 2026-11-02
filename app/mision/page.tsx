@@ -1,6 +1,11 @@
+import type { Metadata } from "next"
 import MissionSection from "@/components/sections/mission-section"
 import Footer from "@/components/layout/footer"
+import ProcessBand from "@/components/sections/home/process-band"
+import CtaBand from "@/components/sections/home/cta-band"
 import { PageHero } from "@/components/layout/page-hero"
+
+export const metadata: Metadata = { title: "Misión" }
 
 export default function MisionPage() {
   return (
@@ -22,6 +27,9 @@ export default function MisionPage() {
         }}
       />
       <MissionSection />
+      <ProcessBand />
+      <div className="h-20 bg-background md:h-24" />
+      <CtaBand />
       <Footer />
     </div>
   )

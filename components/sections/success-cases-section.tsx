@@ -1,5 +1,9 @@
 "use client"
 
+import Image from "next/image"
+import Link from "next/link"
+import { ArrowRight } from "lucide-react"
+import { CASES } from "@/lib/cases"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -10,10 +14,6 @@ import {
   Bike,
   Building2,
   Bot,
-  Briefcase,
-  Users,
-  Star,
-  ShieldCheck,
 } from "lucide-react"
 import { useLanguage } from "@/components/providers/language-provider"
 
@@ -21,8 +21,9 @@ const copy = {
   es: {
     heading: "Casos de éxito",
     intro:
-      "Proyectos reales entregados a clientes en Venezuela y la región. Algunos nombres de marca están bajo NDA; los resultados son medidos, no marketing.",
+      "Proyectos reales entregados a clientes en Venezuela y la región. Algunos nombres de marca están bajo NDA; los resultados son medidos, no marketing. Las fotos son imágenes de referencia de cada sector (Unsplash).",
     resultsLabel: "Resultados medidos",
+    open: "Ver caso completo",
     stackLabel: "Stack",
     metricsLabels: {
       projects: "Proyectos entregados",
@@ -102,8 +103,9 @@ const copy = {
   en: {
     heading: "Success stories",
     intro:
-      "Real projects delivered to clients in Venezuela and the region. Some brand names are under NDA; the results are measured, not marketing.",
+      "Real projects delivered to clients in Venezuela and the region. Some brand names are under NDA; the results are measured, not marketing. Photos are reference images of each industry (Unsplash).",
     resultsLabel: "Measured results",
+    open: "See full case",
     stackLabel: "Stack",
     metricsLabels: {
       projects: "Projects delivered",
@@ -182,6 +184,16 @@ const copy = {
   },
 }
 
+// Fotos de contexto de Unsplash (ver public/projects/CREDITOS.md); no son de los clientes.
+const photos = [
+  { src: "/projects/clinica-dental.webp", es: "Consultorio dental moderno", en: "Modern dental office" },
+  { src: "/projects/tienda-moda.webp", es: "Percheros con ropa en una tienda", en: "Clothing racks in a store" },
+  { src: "/projects/logistica-almacen.webp", es: "Estanterías de almacén con cajas", en: "Warehouse shelving with boxes" },
+  { src: "/projects/delivery-moto.webp", es: "Repartidor en scooter de noche", en: "Delivery rider on a scooter at night" },
+  { src: "/projects/inmobiliaria-edificio.webp", es: "Edificio residencial con balcones", en: "Residential building with balconies" },
+  { src: "/projects/hotel-lobby.webp", es: "Lobby de hotel", en: "Hotel lobby" },
+]
+const anchors = ["caso-clinica", "caso-ecommerce", "caso-logistica", "caso-delivery", "caso-bi", "caso-chatbot"]
 const icons = [Stethoscope, ShoppingBag, Truck, Bike, Building2, Bot]
 const techStacks = [
   ["Next.js", "Tailwind", "Supabase", "Resend"],
@@ -197,17 +209,16 @@ export default function SuccessCasesSection() {
   const t = copy[lang]
 
   const metrics = [
-    { number: "30+", label: t.metricsLabels.projects, icon: Briefcase },
-    { number: "20+", label: t.metricsLabels.clients, icon: Users },
-    { number: "4.9/5", label: t.metricsLabels.satisfaction, icon: Star },
-    { number: "99.9%", label: t.metricsLabels.uptime, icon: ShieldCheck },
+    { number: "30+", label: t.metricsLabels.projects },
+    { number: "20+", label: t.metricsLabels.clients },
+    { number: "4.9/5", label: t.metricsLabels.satisfaction },
+    { number: "99.9%", label: t.metricsLabels.uptime },
   ]
 
   return (
-    <section id="casos" className="py-20 bg-gradient-to-br from-muted/50 to-primary/5">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{t.heading}</h2>
+    <section id="casos" className="bg-background py-16 md:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-12 max-w-3xl">
           <p className="text-lg text-muted-foreground">{t.intro}</p>
         </div>
 
@@ -217,15 +228,27 @@ export default function SuccessCasesSection() {
             return (
               <Card
                 key={index}
-                className="bg-card border-border hover:border-primary/40 hover:shadow-xl transition-all duration-300 group flex flex-col"
+                id={anchors[index]}
+                className="group relative flex scroll-mt-24 flex-col overflow-hidden rounded-[14px] border-border bg-card pt-0 shadow-none transition-[border-color,box-shadow] duration-300 hover:border-primary/40 hover:shadow-[0_18px_40px_-20px_oklch(0.546_0.215_263/0.45)]"
               >
+                <div className="relative aspect-[16/9] overflow-hidden bg-muted">
+                  <Image
+                    src={photos[index].src}
+                    alt={photos[index][lang]}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                  />
+                </div>
                 <CardHeader>
                   <div className="flex items-center space-x-4 mb-2">
-                    <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110">
-                      <Icon className="h-6 w-6 text-primary" />
-                    </div>
+                    <Icon className="h-6 w-6 shrink-0 text-primary" strokeWidth={1.5} aria-hidden="true" />
                     <div className="min-w-0">
-                      <CardTitle className="text-card-foreground text-base leading-snug">{project.title}</CardTitle>
+                      <CardTitle className="text-card-foreground text-base leading-snug">
+                        <Link href={`/casos-de-exito/${CASES[index].slug}`} className="after:absolute after:inset-0 hover:text-primary">
+                          {project.title}
+                        </Link>
+                      </CardTitle>
                       <p className="text-xs text-muted-foreground mt-1">{project.client}</p>
                     </div>
                   </div>
@@ -234,7 +257,7 @@ export default function SuccessCasesSection() {
                   <CardDescription className="text-muted-foreground mb-5">{project.description}</CardDescription>
 
                   <div className="mb-5">
-                    <h4 className="font-semibold text-foreground mb-3 text-sm">{t.resultsLabel}</h4>
+                    <h3 className="font-semibold text-foreground mb-3 text-sm">{t.resultsLabel}</h3>
                     <div className="space-y-2">
                       {project.results.map((result, resultIndex) => (
                         <div key={resultIndex} className="flex items-start space-x-2">
@@ -246,10 +269,14 @@ export default function SuccessCasesSection() {
                   </div>
 
                   <div className="mt-auto">
-                    <h4 className="font-semibold text-foreground mb-2 text-sm">{t.stackLabel}</h4>
+                    <span className="mb-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+                      {t.open}
+                      <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden="true" />
+                    </span>
+                    <h3 className="font-semibold text-foreground mb-2 text-sm">{t.stackLabel}</h3>
                     <div className="flex flex-wrap gap-2">
                       {techStacks[index].map((tech, techIndex) => (
-                        <Badge key={techIndex} variant="outline" className="text-xs border-primary/30 text-primary">
+                        <Badge key={techIndex} variant="outline" className="rounded-full border-border bg-background text-xs font-normal">
                           {tech}
                         </Badge>
                       ))}
@@ -261,20 +288,14 @@ export default function SuccessCasesSection() {
           })}
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {metrics.map((metric, index) => (
-            <div
-              key={index}
-              className="text-center p-6 bg-background rounded-lg border border-border hover:shadow-lg transition-all duration-300 hover:scale-105 group"
-            >
-              <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 transition-all duration-300 group-hover:scale-110">
-                <metric.icon className="h-6 w-6 text-primary" />
-              </div>
-              <div className="text-2xl font-bold text-primary mb-1">{metric.number}</div>
-              <div className="text-sm text-muted-foreground">{metric.label}</div>
+        <dl className="dark grid grid-cols-2 gap-x-8 gap-y-10 rounded-[20px] bg-background p-8 text-foreground md:grid-cols-4 md:p-10">
+          {metrics.map((metric) => (
+            <div key={metric.label} className="flex flex-col border-t border-border pt-5">
+              <dt className="order-2 mt-1.5 text-sm text-muted-foreground">{metric.label}</dt>
+              <dd className="order-1 text-4xl font-bold tabular-nums text-accent">{metric.number}</dd>
             </div>
           ))}
-        </div>
+        </dl>
       </div>
     </section>
   )

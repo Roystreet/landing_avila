@@ -1,6 +1,9 @@
+import type { Metadata } from "next"
 import ServicesSection from "@/components/sections/services-section"
 import Footer from "@/components/layout/footer"
 import { PageHero } from "@/components/layout/page-hero"
+
+export const metadata: Metadata = { title: "Servicios" }
 
 export default function ServiciosPage() {
   return (

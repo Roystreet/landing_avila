@@ -2,10 +2,8 @@
 
 import { FormEvent, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import {
-  Calculator,
   Clock,
   DollarSign,
   FileText,
@@ -320,40 +318,34 @@ export default function QuoteSection() {
   }
 
   return (
-    <section id="cotizacion" className="py-20 bg-linear-to-br from-background via-muted/20 to-primary/5">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16 max-w-3xl mx-auto">
-            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-              <Calculator className="h-3 w-3 mr-1" />
-              {t.badge}
-            </Badge>
-            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4 text-balance">
-              {t.title} <span className="text-primary">{t.titleHighlight}</span>
+    <section id="cotizacion" className="scroll-mt-16 bg-background py-16 md:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div>
+          <div className="mb-12 max-w-3xl">
+            <h2 className="text-3xl font-bold leading-tight md:text-5xl">
+              {t.title} {t.titleHighlight}
             </h2>
-            <p className="text-lg text-muted-foreground text-pretty">{t.intro}</p>
+            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">{t.intro}</p>
           </div>
 
           {/* Perks */}
-          <div className="grid md:grid-cols-3 gap-4 mb-12">
+          <ul className="mb-12 grid gap-8 border-t border-foreground/80 pt-8 md:grid-cols-3">
             {t.perks.map((p, i) => {
               const Icon = perkIcons[i]
               return (
-                <Card key={i} className="bg-card border-border">
-                  <CardContent className="p-6">
-                    <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center mb-3">
-                      <Icon className="h-5 w-5 text-primary" />
-                    </div>
-                    <h3 className="font-semibold text-card-foreground mb-1">{p.title}</h3>
-                    <p className="text-sm text-muted-foreground">{p.description}</p>
-                  </CardContent>
-                </Card>
+                <li key={p.title} className="flex gap-4">
+                  <Icon className="mt-0.5 h-6 w-6 shrink-0 text-primary" strokeWidth={1.5} aria-hidden="true" />
+                  <div>
+                    <h3 className="font-semibold">{p.title}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{p.description}</p>
+                  </div>
+                </li>
               )
             })}
-          </div>
+          </ul>
 
           {/* Quote form */}
-          <Card className="bg-card border-border shadow-2xl">
+          <Card className="rounded-[20px] border-border bg-card shadow-[0_24px_60px_-30px_oklch(0.17_0.025_265/0.35)]">
             <CardContent className="p-6 md:p-10">
               <form className="space-y-8" onSubmit={handleSubmit}>
                 {/* Step 1: Service type */}
@@ -374,8 +366,8 @@ export default function QuoteSection() {
                           key={service.id}
                           type="button"
                           onClick={() => toggleService(service.id)}
-                          className={`flex cursor-pointer items-center gap-3 p-4 rounded-lg border transition-all duration-300 ${isActive
-                            ? "bg-primary/10 border-primary text-primary shadow-md shadow-primary/10"
+                          className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition-colors ${isActive
+                            ? "bg-primary/10 border-primary text-primary"
                             : "bg-background border-border hover:border-primary/50 text-muted-foreground hover:text-foreground"
                             }`}
                         >
@@ -410,7 +402,7 @@ export default function QuoteSection() {
                         placeholder={t.projectName}
                         autoComplete="organization-title"
                         required
-                        className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
+                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
                       />
                     </div>
                     <div className="space-y-2">
@@ -428,12 +420,12 @@ export default function QuoteSection() {
                       />
                     </div>
                     <div className="grid md:grid-cols-2 gap-4">
-                      <div className="relative rounded-2xl border border-border/70 bg-linear-to-br from-background via-background to-primary/5 p-px shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 focus-within:border-primary/60 focus-within:shadow-lg focus-within:shadow-primary/10">
-                        <div className="relative rounded-[calc(var(--radius-2xl)-1px)] bg-background/95 backdrop-blur">
+                      <div className="relative rounded-xl border border-border bg-background transition-colors hover:border-primary/40">
+                        <div className="relative rounded-xl bg-background">
                           <label htmlFor="quote-timeline" className="sr-only">
                             {t.fieldLabels.timeline}
                           </label>
-                          <div className="pointer-events-none absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl border border-primary/10 bg-primary/8 text-primary">
+                          <div className="pointer-events-none absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg bg-primary/10 text-primary">
                             <Clock className="h-4 w-4" />
                           </div>
                           <input type="hidden" name="timeline" value={timelineValue} />
@@ -448,7 +440,7 @@ export default function QuoteSection() {
                             >
                               <SelectValue placeholder={t.timelinePlaceholder} />
                             </SelectTrigger>
-                            <SelectContent className="rounded-2xl border-border/80 bg-popover/98 text-popover-foreground shadow-2xl shadow-primary/10 backdrop-blur-md">
+                            <SelectContent className="rounded-xl border-border bg-popover text-popover-foreground shadow-[0_16px_40px_-16px_oklch(0.17_0.025_265/0.35)]">
                               {t.timelines.map((time) => (
                                 <SelectItem
                                   key={time}
@@ -462,12 +454,12 @@ export default function QuoteSection() {
                           </Select>
                         </div>
                       </div>
-                      <div className="relative rounded-2xl border border-border/70 bg-linear-to-br from-background via-background to-primary/5 p-px shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 focus-within:border-primary/60 focus-within:shadow-lg focus-within:shadow-primary/10">
-                        <div className="relative rounded-[calc(var(--radius-2xl)-1px)] bg-background/95 backdrop-blur">
+                      <div className="relative rounded-xl border border-border bg-background transition-colors hover:border-primary/40">
+                        <div className="relative rounded-xl bg-background">
                           <label htmlFor="quote-budget" className="sr-only">
                             {t.fieldLabels.budget}
                           </label>
-                          <div className="pointer-events-none absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl border border-primary/10 bg-primary/8 text-primary">
+                          <div className="pointer-events-none absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg bg-primary/10 text-primary">
                             <DollarSign className="h-4 w-4" />
                           </div>
                           <input type="hidden" name="budget" value={budgetValue} />
@@ -482,7 +474,7 @@ export default function QuoteSection() {
                             >
                               <SelectValue placeholder={t.budgetPlaceholder} />
                             </SelectTrigger>
-                            <SelectContent className="rounded-2xl border-border/80 bg-popover/98 text-popover-foreground shadow-2xl shadow-primary/10 backdrop-blur-md">
+                            <SelectContent className="rounded-xl border-border bg-popover text-popover-foreground shadow-[0_16px_40px_-16px_oklch(0.17_0.025_265/0.35)]">
                               {t.budgetRanges.map((b) => (
                                 <SelectItem
                                   key={b}
@@ -520,7 +512,7 @@ export default function QuoteSection() {
                         placeholder={t.fullName}
                         autoComplete="name"
                         required
-                        className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
+                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
                       />
                     </div>
                     <div className="space-y-2">
@@ -533,7 +525,7 @@ export default function QuoteSection() {
                         type="text"
                         placeholder={t.company}
                         autoComplete="organization"
-                        className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
+                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
                       />
                     </div>
                     <div className="space-y-2">
@@ -548,7 +540,7 @@ export default function QuoteSection() {
                         autoComplete="email"
                         spellCheck={false}
                         required
-                        className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
+                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
                       />
                     </div>
                     <div className="space-y-2">
@@ -562,7 +554,7 @@ export default function QuoteSection() {
                         placeholder={t.phone}
                         autoComplete="tel"
                         required
-                        className="px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-foreground transition-all duration-300"
+                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
                       />
                     </div>
                   </div>
@@ -595,10 +587,10 @@ export default function QuoteSection() {
                     type="submit"
                     size="lg"
                     disabled={isSubmitting}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto transition-all duration-300 hover:scale-105 hover:shadow-xl group whitespace-nowrap"
+                    className="group w-full whitespace-nowrap rounded-full bg-primary px-6 text-primary-foreground transition-colors hover:bg-[var(--primary-hover)] sm:w-auto"
                   >
                     {isSubmitting ? t.sending : t.submit}
-                    <Send className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    <Send className="ml-2 h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5" />
                   </Button>
                 </div>
               </form>

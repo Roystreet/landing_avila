@@ -1,6 +1,9 @@
+import type { Metadata } from "next"
 import ContactSection from "@/components/sections/contact-section"
 import Footer from "@/components/layout/footer"
 import { PageHero } from "@/components/layout/page-hero"
+
+export const metadata: Metadata = { title: "Contacto" }
 
 export default function ContactoPage() {
   return (

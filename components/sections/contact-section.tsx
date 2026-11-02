@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Mail, Phone, MapPin, Rocket, Clock, Users, Award, MessageCircle } from "lucide-react"
+import { WhatsAppIcon } from "@/components/brand/whatsapp-icon"
 import { useLanguage } from "@/components/providers/language-provider"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
@@ -162,7 +163,7 @@ const copy = {
   },
 }
 
-const contactIcons = [Mail, MessageCircle, MapPin]
+const contactIcons = [Mail, WhatsAppIcon, MapPin]
 const extraIcons = [MessageCircle, Users, Award]
 const PROJECT_DESCRIPTION_MIN_LENGTH = 10
 
@@ -286,28 +287,26 @@ export default function ContactSection() {
   }
 
   return (
-    <section id="contacto" className="py-20 bg-linear-to-br from-primary/5 to-accent/5">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{t.heading}</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t.subheading}</p>
+    <section id="contacto" className="bg-background py-16 md:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div>
+          <div className="mb-12 max-w-3xl">
+            <h2 className="text-3xl font-bold leading-tight md:text-5xl">{t.heading}</h2>
+            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">{t.subheading}</p>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-12">
             <div className="lg:col-span-1">
               <h3 className="text-xl font-semibold text-foreground mb-6">{t.contactHeading}</h3>
-              <div className="space-y-4">
+              <div className="divide-y divide-border border-y border-border">
                 {t.contactInfo.map((contact, index) => {
                   const Icon = contactIcons[index]
                   return (
                     <div
                       key={index}
-                      className="flex items-center space-x-4 p-4 bg-background rounded-lg border border-border hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group"
+                      className="flex items-center gap-4 py-4"
                     >
-                      <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110">
-                        <Icon className="h-5 w-5 text-primary" />
-                      </div>
+                      <Icon className="h-6 w-6 shrink-0 text-primary" aria-hidden="true" />
                       <div className="min-w-0">
                         <div className="text-sm text-muted-foreground">{contact.label}</div>
                         <div className="font-semibold text-foreground break-all">{contact.value}</div>
@@ -317,10 +316,10 @@ export default function ContactSection() {
                 })}
               </div>
 
-              <div className="mt-8 p-6 bg-background rounded-lg border border-border">
+              <div className="mt-8 rounded-[14px] border border-border bg-card p-6">
                 <div className="flex items-center space-x-2 mb-4">
                   <Clock className="h-5 w-5 text-primary" />
-                  <h4 className="font-semibold text-foreground">{t.hoursTitle}</h4>
+                  <h4 className="font-semibold">{t.hoursTitle}</h4>
                 </div>
                 <div className="space-y-2">
                   {t.businessHours.map((schedule, index) => (
@@ -332,9 +331,9 @@ export default function ContactSection() {
                 </div>
               </div>
 
-              <div className="mt-6 p-6 bg-primary/5 rounded-lg border border-primary/20">
+              <div className="dark mt-6 rounded-[14px] bg-background p-6 text-foreground">
                 <h4 className="font-semibold text-foreground mb-2 flex items-center">
-                  <Rocket className="h-4 w-4 mr-2" />
+                  <Rocket className="mr-2 h-4 w-4 text-accent" aria-hidden="true" />
                   {t.consultTitle}
                 </h4>
                 <p className="text-sm text-muted-foreground">{t.consultDesc}</p>
@@ -342,7 +341,7 @@ export default function ContactSection() {
             </div>
 
             <div className="lg:col-span-2">
-              <div className="bg-background rounded-lg border border-border p-8">
+              <div className="rounded-[20px] border border-border bg-card p-6 shadow-[0_24px_60px_-30px_oklch(0.17_0.025_265/0.35)] md:p-8">
                 <h3 className="text-xl font-semibold text-foreground mb-6">{t.formHeading}</h3>
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -357,7 +356,7 @@ export default function ContactSection() {
                         placeholder={t.fullName}
                         autoComplete="name"
                         required
-                        className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
+                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all duration-300 hover:border-primary/50"
                       />
                     </div>
                     <div className="space-y-2">
@@ -370,7 +369,7 @@ export default function ContactSection() {
                         type="text"
                         placeholder={t.company}
                         autoComplete="organization"
-                        className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
+                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all duration-300 hover:border-primary/50"
                       />
                     </div>
                   </div>
@@ -387,7 +386,7 @@ export default function ContactSection() {
                         autoComplete="email"
                         spellCheck={false}
                         required
-                        className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
+                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all duration-300 hover:border-primary/50"
                       />
                     </div>
                     <div className="space-y-2">
@@ -401,7 +400,7 @@ export default function ContactSection() {
                         placeholder={t.phoneLabel}
                         autoComplete="tel"
                         required
-                        className="px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
+                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all duration-300 hover:border-primary/50"
                       />
                     </div>
                   </div>
@@ -415,13 +414,13 @@ export default function ContactSection() {
                         id="contact-project-type"
                         aria-label={t.projectType}
                         className={cn(
-                          "h-auto w-full rounded-lg border border-border bg-input px-4 py-3 text-left text-sm shadow-none transition-all duration-300 hover:border-primary/50 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring",
+                          "h-auto w-full rounded-xl border border-border bg-background px-4 py-3 text-left text-sm shadow-none transition-all duration-300 hover:border-primary/50 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring",
                           projectTypeValue ? "text-foreground" : "text-muted-foreground"
                         )}
                       >
                         <SelectValue placeholder={t.projectType} />
                       </SelectTrigger>
-                      <SelectContent className="rounded-xl border-border/80 bg-popover/98 text-popover-foreground shadow-xl shadow-primary/10 backdrop-blur-md">
+                      <SelectContent className="rounded-xl border-border bg-popover text-popover-foreground shadow-[0_16px_40px_-16px_oklch(0.17_0.025_265/0.35)]">
                         {t.projectTypes.map((projectType) => (
                           <SelectItem
                             key={projectType}
@@ -442,13 +441,13 @@ export default function ContactSection() {
                         id="contact-budget"
                         aria-label={t.budgetLabel}
                         className={cn(
-                          "h-auto w-full rounded-lg border border-border bg-input px-4 py-3 text-left text-sm shadow-none transition-all duration-300 hover:border-primary/50 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring",
+                          "h-auto w-full rounded-xl border border-border bg-background px-4 py-3 text-left text-sm shadow-none transition-all duration-300 hover:border-primary/50 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring",
                           budgetValue ? "text-foreground" : "text-muted-foreground"
                         )}
                       >
                         <SelectValue placeholder={t.budgetLabel} />
                       </SelectTrigger>
-                      <SelectContent className="rounded-xl border-border/80 bg-popover/98 text-popover-foreground shadow-xl shadow-primary/10 backdrop-blur-md">
+                      <SelectContent className="rounded-xl border-border bg-popover text-popover-foreground shadow-[0_16px_40px_-16px_oklch(0.17_0.025_265/0.35)]">
                         {t.budgets.map((budget) => (
                           <SelectItem
                             key={budget}
@@ -471,7 +470,7 @@ export default function ContactSection() {
                       type="text"
                       placeholder={t.industry}
                       autoComplete="organization-title"
-                      className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground transition-all duration-300 hover:border-primary/50"
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all duration-300 hover:border-primary/50"
                     />
                   </div>
                   <div className="space-y-2">
@@ -485,7 +484,7 @@ export default function ContactSection() {
                       rows={5}
                       minLength={PROJECT_DESCRIPTION_MIN_LENGTH}
                       required
-                      className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground resize-none transition-all duration-300 hover:border-primary/50"
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none transition-all duration-300 hover:border-primary/50"
                     />
                   </div>
 
@@ -532,30 +531,30 @@ export default function ContactSection() {
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group"
+                    className="group w-full rounded-full bg-primary text-primary-foreground transition-colors hover:bg-[var(--primary-hover)]"
                   >
                     {isSubmitting ? t.sending : t.submit}
-                    <Rocket className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    <Rocket className="ml-2 h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5" />
                   </Button>
                 </form>
               </div>
             </div>
           </div>
 
-          <div className="mt-16 grid md:grid-cols-3 gap-6">
+          <ul className="mt-16 grid gap-8 border-t border-foreground/80 pt-8 md:grid-cols-3">
             {t.extra.map((item, index) => {
               const Icon = extraIcons[index]
               return (
-                <div key={index} className="text-center p-6 bg-background rounded-lg border border-border">
-                  <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <Icon className="h-6 w-6 text-primary" />
+                <li key={item.title} className="flex gap-4">
+                  <Icon className="mt-0.5 h-6 w-6 shrink-0 text-primary" strokeWidth={1.5} aria-hidden="true" />
+                  <div>
+                    <h3 className="font-semibold">{item.title}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
                   </div>
-                  <h4 className="font-semibold text-foreground mb-2">{item.title}</h4>
-                  <p className="text-sm text-muted-foreground">{item.desc}</p>
-                </div>
+                </li>
               )
             })}
-          </div>
+          </ul>
         </div>
       </div>
     </section>

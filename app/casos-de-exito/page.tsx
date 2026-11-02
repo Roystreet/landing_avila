@@ -1,6 +1,9 @@
+import type { Metadata } from "next"
 import SuccessCasesSection from "@/components/sections/success-cases-section"
 import Footer from "@/components/layout/footer"
 import { PageHero } from "@/components/layout/page-hero"
+
+export const metadata: Metadata = { title: "Casos de éxito" }
 
 export default function CasosDeExitoPage() {
   return (

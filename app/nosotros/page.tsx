@@ -1,6 +1,9 @@
+import type { Metadata } from "next"
 import AboutSection from "@/components/sections/about-section"
 import Footer from "@/components/layout/footer"
 import { PageHero } from "@/components/layout/page-hero"
+
+export const metadata: Metadata = { title: "Nosotros" }
 
 export default function NosotrosPage() {
   return (
