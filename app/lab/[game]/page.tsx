@@ -15,7 +15,12 @@ export async function generateMetadata({ params }: { params: Promise<{ game: str
   return {
     title: `${meta.title.es} · Lab`,
     description: meta.pitch.es,
-    openGraph: { title: `${meta.title.es} · Avila System Lab`, description: meta.pitch.es },
+    openGraph: {
+      title: `${meta.title.es} · Avila System Lab`,
+      description: meta.pitch.es,
+      images: [{ url: `/lab/thumbs/${meta.slug}-og.jpg`, width: 1200, height: 630, alt: meta.title.es }],
+    },
+    twitter: { card: "summary_large_image", images: [`/lab/thumbs/${meta.slug}-og.jpg`] },
   }
 }
 
