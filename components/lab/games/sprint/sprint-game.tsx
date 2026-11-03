@@ -180,6 +180,7 @@ export default function SprintGame({ lang }: LabGameProps) {
           setResult(r)
           setPhase("over")
           labAudio.stopAmbient()
+          labAudio.play(r.reason === "time" ? "done" : "lose")
         },
         onAutoPause: () => {
           engineRef.current?.setPaused(true)

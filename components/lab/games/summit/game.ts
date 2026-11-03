@@ -17,7 +17,7 @@ import {
   TweenManager,
   type Rng,
 } from "@/components/lab/engine/core"
-import { labAudio } from "@/components/lab/engine/audio"
+import { labAudio, type LoopHandle } from "@/components/lab/engine/audio"
 import { buildWorld, groundY, LANE_X, TRACK_LENGTH, type SummitWorld } from "@/components/lab/games/summit/world"
 import {
   buildBoulder,
@@ -182,6 +182,8 @@ export class SummitGame {
   private fpsAcc = 0
   private fpsFrames = 0
   private quality = 2
+  private rumble: LoopHandle | null = null
+  private buzz: LoopHandle | null = null
   private commits = 0
   private combo = 0
   private comboTimer = 0
@@ -334,6 +336,10 @@ export class SummitGame {
   start() {
     labAudio.unlock()
     labAudio.startAmbient("night")
+    labAudio.setTurbo(false)
+    // Bucles de proximidad: suenan según la distancia de la roca y del bug más cercanos
+    this.rumble ??= labAudio.loop("rumble")
+    this.buzz ??= labAudio.loop("buzz")
     this.resetRun()
     this.setPhase("playing")
     labAudio.play("whoosh")
@@ -342,11 +348,57 @@ export class SummitGame {
   pause() {
     if (this.phase !== "playing") return
     this.setPhase("paused")
+    this.silenceLoops()
+    labAudio.setMusicTone(0.2)
   }
 
   resume() {
     if (this.phase !== "paused") return
     this.setPhase("playing")
+  }
+
+  private silenceLoops() {
+    this.rumble?.set(0)
+    this.buzz?.set(0)
+  }
+
+  /** Mezcla adaptativa: intensidad, tono de la música y sonidos de proximidad. */
+  private updateAudio() {
+    if (this.phase !== "playing") return
+    const pz = -this.distance
+    const progress = this.distance / TRACK_LENGTH
+    let nearestBoulder = Infinity
+    let boulderX = 0
+    let nearestBug = Infinity
+    let bugX = 0
+    let threats = 0
+    for (const o of this.obstacles) {
+      if (!o.active || o.hit) continue
+      const ahead = pz - o.z
+      if (ahead < -2 || ahead > 60) continue
+      if (ahead < 25) threats += 1
+      if (o.kind === "boulder" && ahead < nearestBoulder) {
+        nearestBoulder = ahead
+        boulderX = o.x
+      }
+      if (o.kind === "bug" && ahead < nearestBug) {
+        nearestBug = ahead
+        bugX = o.x
+      }
+    }
+    const intensity = 0.3 + progress * 0.3 + Math.min(0.25, threats * 0.08) + ((this.speed - 10) / 8) * 0.15
+    labAudio.setIntensity(this.powers.turbo > 0 ? 1 : intensity)
+    labAudio.setTurbo(this.powers.turbo > 0)
+    // Batería baja: la música se apaga como si te taparas los oídos
+    labAudio.setMusicTone(this.health < LOW_HEALTH ? 0.32 : 1)
+    const near = (d: number, range: number) => (d < range ? Math.pow(1 - Math.max(0, d) / range, 2) : 0)
+    this.rumble?.set(near(nearestBoulder, 45) * 0.55, (boulderX - this.x) / 4, this.speed / 17)
+    this.buzz?.set(near(nearestBug, 18) * 0.22, (bugX - this.x) / 4, Math.random())
+  }
+
+  /** Paneo estéreo según la posición lateral respecto al jugador. */
+  private pan(x: number) {
+    return THREE.MathUtils.clamp((x - this.x) / 4, -0.9, 0.9)
   }
 
   private setPhase(phase: Phase) {
@@ -569,7 +621,10 @@ export class SummitGame {
     fog.density = THREE.MathUtils.lerp(0.0105 - prog * 0.003, 0.019, mist)
     fog.color.setRGB(0.047 + mist * 0.05, 0.078 + mist * 0.06, 0.157 + mist * 0.07)
 
-    if (this.phase === "playing") this.updatePlaying(dt)
+    if (this.phase === "playing") {
+      this.updatePlaying(dt)
+      this.updateAudio()
+    }
     else if (this.phase === "won" || this.phase === "lost") this.updateEnding(dt)
     else this.animateIdle(rawDt, elapsed)
 
@@ -623,12 +678,12 @@ export class SummitGame {
       if (it === "left" && this.laneIndex > 0) {
         this.laneFrom = this.laneIndex
         this.laneIndex -= 1
-        labAudio.play("whoosh", this.rng.next())
+        labAudio.play("whoosh", this.rng.next(), { pan: -0.35, gain: 0.8 })
         this.lean = 1
       } else if (it === "right" && this.laneIndex < 2) {
         this.laneFrom = this.laneIndex
         this.laneIndex += 1
-        labAudio.play("whoosh", this.rng.next())
+        labAudio.play("whoosh", this.rng.next(), { pan: 0.35, gain: 0.8 })
         this.lean = -1
       } else if (it === "jump") {
         this.jumpBuffer = 0.14
@@ -804,7 +859,7 @@ export class SummitGame {
       // Deploy continuo: atraviesa todo y suma puntos
       this.bonus += 15
       this.shake.add(0.25)
-      labAudio.play(HIT_SOUND[o.kind], this.rng.next())
+      labAudio.play(HIT_SOUND[o.kind], this.rng.next(), { pan: this.pan(o.x) })
       this.sparks.burst(at, POWER_COLORS.turbo, this.reduced ? 8 : 30, 6, this.rng.next)
       if (o.kind === "bug" || o.kind === "boulder") this.knockAway(o, 1.6)
       else o.group.visible = false
@@ -832,7 +887,7 @@ export class SummitGame {
     this.shake.add(0.5)
     if (!this.reduced) this.fovPunch = 7
     this.speed *= 0.72
-    labAudio.play(HIT_SOUND[o.kind], this.rng.next())
+    labAudio.play(HIT_SOUND[o.kind], this.rng.next(), { pan: this.pan(o.x) })
     this.sparks.burst(at, 0xff4d5e, this.reduced ? 10 : 40, 4.5, this.rng.next)
     this.vibrate(70)
     // El obstáculo sale despedido
@@ -850,7 +905,7 @@ export class SummitGame {
     this.invuln = 0.45
     this.combo = 0
     this.shake.add(0.22)
-    labAudio.play("error", this.rng.next())
+    labAudio.play("error", this.rng.next(), { pan: this.pan(o.x) })
     this.sparks.burst(new THREE.Vector3((this.x + o.x) / 2, groundY(-this.distance) + 0.7, -this.distance), 0xffc46b, this.reduced ? 6 : 18, 3, this.rng.next)
     this.onEvent({ type: "graze", kind: o.kind })
     if (this.health <= 0) this.lose()
@@ -859,7 +914,7 @@ export class SummitGame {
   private nearMiss(o: Obstacle) {
     this.bonus += 25
     if (!this.reduced) this.slowmo = 0.16
-    labAudio.play("combo", 0.8)
+    labAudio.play("combo", 0.8, { pan: this.pan(o.x) })
     this.sparks.burst(new THREE.Vector3(o.x, groundY(o.z) + 0.6, o.z), 0xdbe7ff, this.reduced ? 4 : 14, 2.2, this.rng.next)
     this.onEvent({ type: "near-miss" })
   }
@@ -871,7 +926,13 @@ export class SummitGame {
     this.healCounter += 1
     this.combo = this.comboTimer > 0 ? this.combo + 1 : 1
     this.comboTimer = 1.2
-    labAudio.play(this.combo >= 5 && this.combo % 5 === 0 ? "combo" : "pickup", Math.min(1, 0.3 + this.combo * 0.06))
+    // La racha sube el tono de cada commit: suena como una escala que asciende
+    const penta = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24]
+    const semitone = penta[Math.min(penta.length - 1, this.combo - 1)]
+    labAudio.play(this.combo >= 5 && this.combo % 5 === 0 ? "combo" : "pickup", 0.5, {
+      pan: this.pan(p.x) * 0.6,
+      rate: Math.pow(2, semitone / 12) * 0.9,
+    })
     this.sparks.burst(new THREE.Vector3(p.x, groundY(p.z) + p.y, p.z), 0x8fb5ff, this.reduced ? 6 : 16, 2.5, this.rng.next)
     this.shake.add(0.04)
     const startY = p.y
@@ -963,6 +1024,9 @@ export class SummitGame {
   private win() {
     this.distance = TRACK_LENGTH
     this.setPhase("won")
+    this.silenceLoops()
+    labAudio.setIntensity(0.25)
+    labAudio.setTurbo(false)
     labAudio.play("win")
     this.endTimer = 0
     const summit = new THREE.Vector3(0, groundY(-TRACK_LENGTH) + 2, -TRACK_LENGTH - 6)
@@ -975,6 +1039,7 @@ export class SummitGame {
 
   private lose() {
     this.setPhase("lost")
+    this.silenceLoops()
     labAudio.play("lose")
     labAudio.stopAmbient()
     this.endTimer = 0
@@ -1066,7 +1131,8 @@ export class SummitGame {
     const step = Math.floor(this.stride / Math.PI)
     if (step !== this.stepPhase) {
       this.stepPhase = step
-      if (this.grounded && this.phase === "playing") labAudio.play("step", this.rng.next())
+      // Pasos alternando izquierda y derecha
+      if (this.grounded && this.phase === "playing") labAudio.play("step", this.rng.next(), { pan: step % 2 ? 0.12 : -0.12 })
     }
     if (this.grounded) {
       this.animateLimbs(0.5, this.stride)
@@ -1252,6 +1318,8 @@ export class SummitGame {
 
   dispose() {
     this.disposed = true
+    this.rumble?.stop()
+    this.buzz?.stop()
     this.loop.stop()
     labAudio.stopAmbient()
     this.composer?.dispose()

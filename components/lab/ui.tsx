@@ -54,19 +54,89 @@ export function useMuted() {
   return [muted, (m: boolean) => labAudio.setMuted(m)] as const
 }
 
+function useVolumes() {
+  const [v, setV] = useState(labAudio.volumes)
+  useEffect(() => {
+    setV(labAudio.volumes)
+    return labAudio.subscribeVolume(setV)
+  }, [])
+  return v
+}
+
+/** Botón de sonido: abre un panel con silencio y volúmenes de música y efectos. */
 export function MuteButton({ lang }: { lang: Language }) {
   const [muted, setMuted] = useMuted()
+  const volumes = useVolumes()
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const t =
+    lang === "es"
+      ? { label: "Sonido", on: "Sonido activado", off: "Silenciado", music: "Música", sfx: "Efectos" }
+      : { label: "Sound", on: "Sound on", off: "Muted", music: "Music", sfx: "Effects" }
+
+  useEffect(() => {
+    if (!open) return
+    const close = (e: PointerEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false)
+    window.addEventListener("pointerdown", close)
+    window.addEventListener("keydown", esc)
+    return () => {
+      window.removeEventListener("pointerdown", close)
+      window.removeEventListener("keydown", esc)
+    }
+  }, [open])
+
   return (
-    <HudButton
-      label={muted ? (lang === "es" ? "Activar sonido" : "Unmute") : lang === "es" ? "Silenciar" : "Mute"}
-      pressed={muted}
-      onClick={() => {
-        labAudio.unlock()
-        setMuted(!muted)
-      }}
-    >
-      {muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-    </HudButton>
+    <div ref={ref} className="pointer-events-auto relative">
+      <HudButton
+        label={t.label}
+        pressed={open}
+        onClick={() => {
+          labAudio.unlock()
+          setOpen((o) => !o)
+        }}
+      >
+        {muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+      </HudButton>
+      {open && (
+        <div
+          role="dialog"
+          aria-label={t.label}
+          className="lab-card-in absolute right-0 top-12 z-30 w-56 rounded-2xl border border-white/10 bg-[oklch(0.19_0.028_265)] p-4 text-white shadow-[0_20px_50px_-20px_oklch(0.05_0.02_265)]"
+        >
+          <button
+            type="button"
+            onClick={() => setMuted(!muted)}
+            aria-pressed={!muted}
+            className="flex w-full items-center justify-between gap-3 text-sm font-semibold"
+          >
+            {muted ? t.off : t.on}
+            <span className={cn("relative h-6 w-11 rounded-full transition-colors", muted ? "bg-white/15" : "bg-[#2563EB]")}>
+              <span className={cn("absolute top-0.5 h-5 w-5 rounded-full bg-white transition-[left]", muted ? "left-0.5" : "left-[22px]")} />
+            </span>
+          </button>
+          {(["music", "sfx"] as const).map((k) => (
+            <label key={k} className={cn("mt-4 block text-xs font-semibold text-[oklch(0.78_0.03_257)]", muted && "opacity-50")}>
+              <span className="flex justify-between">
+                {t[k]}
+                <span className="tabular-nums">{Math.round(volumes[k] * 100)}%</span>
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={Math.round(volumes[k] * 100)}
+                disabled={muted}
+                onChange={(e) => labAudio.setVolume(k, Number(e.target.value) / 100)}
+                className="mt-2 w-full accent-[#4F8CFF]"
+              />
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 
