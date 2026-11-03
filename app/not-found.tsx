@@ -30,6 +30,13 @@ export default function NotFound() {
               <ArrowRight className="h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5" />
             </Link>
           </div>
+          <p className="mt-8 text-sm text-muted-foreground">
+            Y ya que te perdiste,{" "}
+            <Link href="/lab/sube-el-avila" className="font-semibold text-foreground underline decoration-primary decoration-2 underline-offset-4">
+              mejor sube el Ávila
+            </Link>
+            .
+          </p>
         </div>
         <Ridge draw className="absolute inset-x-0 bottom-0 h-28 [--ridge-fill:oklch(0.17_0.025_265)] md:h-36" />
       </section>

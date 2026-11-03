@@ -30,6 +30,7 @@ const copy = {
           { label: "Nuestra Misión", href: "/mision" },
           { label: "Casos de Éxito", href: "/casos-de-exito" },
           { label: "Precios", href: "/precios" },
+          { label: "Lab: juegos", href: "/lab" },
         ],
       },
       {
@@ -70,6 +71,7 @@ const copy = {
           { label: "Our Mission", href: "/mision" },
           { label: "Success Stories", href: "/casos-de-exito" },
           { label: "Pricing", href: "/precios" },
+          { label: "Lab: games", href: "/lab" },
         ],
       },
       {

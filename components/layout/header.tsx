@@ -17,6 +17,7 @@ const nav = {
     mission: "Misión",
     about: "Nosotros",
     contact: "Contacto",
+    lab: "Lab",
     cta: "Cotizar mi proyecto",
     menu: "Abrir menú",
     close: "Cerrar menú",
@@ -28,6 +29,7 @@ const nav = {
     mission: "Mission",
     about: "About",
     contact: "Contact",
+    lab: "Lab",
     cta: "Quote my project",
     menu: "Open menu",
     close: "Close menu",
@@ -49,7 +51,9 @@ export default function Header() {
     { href: "/mision", label: t.mission },
     { href: "/nosotros", label: t.about },
     { href: "/contacto", label: t.contact },
+    { href: "/lab", label: t.lab },
   ]
+  const isActive = (href: string) => pathname === href || (href === "/lab" && pathname.startsWith("/lab/"))
 
   return (
     <header className="dark fixed top-0 z-50 w-full border-b border-border bg-background text-foreground">
@@ -60,7 +64,7 @@ export default function Header() {
 
         <nav aria-label="Principal" className="hidden items-center gap-7 lg:gap-8 md:flex">
           {navItems.map((item) => {
-            const active = pathname === item.href
+            const active = isActive(item.href)
             return (
               <Link
                 key={item.href}
@@ -106,10 +110,10 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                aria-current={pathname === item.href ? "page" : undefined}
+                aria-current={isActive(item.href) ? "page" : undefined}
                 className={cn(
                   "block rounded-lg px-3 py-3 text-base font-medium text-muted-foreground hover:bg-muted hover:text-foreground",
-                  pathname === item.href && "bg-muted text-foreground",
+                  isActive(item.href) && "bg-muted text-foreground",
                 )}
               >
                 {item.label}

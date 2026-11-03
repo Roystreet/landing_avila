@@ -1,18 +1,22 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
 import { useLanguage } from "@/components/providers/language-provider"
 import { WHATSAPP_URL } from "@/lib/contact"
 import { cn } from "@/lib/utils"
 import { WhatsAppIcon } from "@/components/brand/whatsapp-icon"
 
 // Acceso directo a WhatsApp, el canal habitual de nuestros clientes en la región.
-// Aparece tras el primer pantallazo y se oculta mientras hay un botón de WhatsApp visible en la página.
+// Aparece tras el primer pantallazo y se oculta mientras hay un botón de WhatsApp visible en la página
+// o mientras se juega en el Lab.
 export function WhatsAppButton() {
   const { lang } = useLanguage()
   const label = lang === "es" ? "Escribir por WhatsApp" : "Message us on WhatsApp"
   const [scrolled, setScrolled] = useState(false)
   const [inlineVisible, setInlineVisible] = useState(false)
+  // En los juegos del Lab el botón taparía los controles táctiles
+  const inGame = usePathname().startsWith("/lab/")
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > window.innerHeight * 0.7)
@@ -36,7 +40,7 @@ export function WhatsAppButton() {
     }
   }, [])
 
-  const shown = scrolled && !inlineVisible
+  const shown = scrolled && !inlineVisible && !inGame
 
   return (
     <a

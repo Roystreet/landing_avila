@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEvent, useMemo, useState } from "react"
+import { FormEvent, useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -214,6 +214,17 @@ export default function QuoteSection() {
     return ""
   }, [status.type])
 
+  // Precarga desde el Lab ("Arma tu app"): /cotizacion?servicios=web,ia&detalle=...
+  const [prefillDetail, setPrefillDetail] = useState("")
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const allowed = ["web", "apps", "sistemas", "cloud", "ia", "otro"]
+    const services = (params.get("servicios") ?? "").split(",").filter((id) => allowed.includes(id))
+    if (services.length) setSelectedServices(Array.from(new Set(services)))
+    const detail = params.get("detalle")
+    if (detail) setPrefillDetail(detail.slice(0, 600))
+  }, [])
+
   const toggleService = (id: string) => {
     setSelectedServices((prev) =>
       prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
@@ -410,8 +421,10 @@ export default function QuoteSection() {
                         {t.fieldLabels.projectDescription}
                       </label>
                       <textarea
+                        key={prefillDetail}
                         id="quote-project-description"
                         name="projectDescription"
+                        defaultValue={prefillDetail}
                         placeholder={t.projectDesc}
                         rows={5}
                         minLength={PROJECT_DESCRIPTION_MIN_LENGTH}
