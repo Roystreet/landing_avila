@@ -782,3 +782,161 @@ export class Sparks {
     this.geo.attributes.color.needsUpdate = true
   }
 }
+
+// ---------- Poderes ----------
+export type PowerKind = "shield" | "turbo" | "magnet" | "double"
+
+export const POWER_COLORS: Record<PowerKind, number> = {
+  shield: 0x4f8cff,
+  turbo: 0xffc46b,
+  magnet: 0xb57cff,
+  double: 0x34d399,
+}
+
+/** Ícono dibujado en lienzo para la cápsula del poder. */
+function powerIcon(kind: PowerKind) {
+  const c = document.createElement("canvas")
+  c.width = c.height = 128
+  const g = c.getContext("2d")!
+  g.strokeStyle = "#ffffff"
+  g.fillStyle = "#ffffff"
+  g.lineWidth = 11
+  g.lineCap = "round"
+  g.lineJoin = "round"
+  if (kind === "shield") {
+    g.beginPath()
+    g.moveTo(64, 18)
+    g.lineTo(104, 32)
+    g.quadraticCurveTo(102, 86, 64, 110)
+    g.quadraticCurveTo(26, 86, 24, 32)
+    g.closePath()
+    g.stroke()
+    g.beginPath()
+    g.moveTo(46, 64)
+    g.lineTo(60, 78)
+    g.lineTo(84, 50)
+    g.stroke()
+  } else if (kind === "turbo") {
+    g.beginPath()
+    g.moveTo(72, 12)
+    g.lineTo(30, 72)
+    g.lineTo(62, 72)
+    g.lineTo(54, 116)
+    g.lineTo(98, 54)
+    g.lineTo(66, 54)
+    g.closePath()
+    g.fill()
+  } else if (kind === "magnet") {
+    g.lineWidth = 22
+    g.lineCap = "butt"
+    g.beginPath()
+    g.arc(64, 60, 30, Math.PI, 0, true)
+    g.stroke()
+    g.fillRect(23, 52, 22, 46)
+    g.fillRect(83, 52, 22, 46)
+  } else {
+    g.font = "800 72px Montserrat, system-ui, sans-serif"
+    g.textAlign = "center"
+    g.textBaseline = "middle"
+    g.fillText("×2", 64, 68)
+  }
+  const t = new THREE.CanvasTexture(c)
+  t.colorSpace = THREE.SRGBColorSpace
+  return t
+}
+
+export type PowerPickup = Pickup & { power: PowerKind; label: THREE.Sprite; core: THREE.Mesh }
+
+export function buildPowerPickup(kind: PowerKind, label: string): PowerPickup {
+  const color = POWER_COLORS[kind]
+  const g = new THREE.Group()
+  // Cápsula de vidrio con núcleo de color y el ícono flotando dentro
+  const shell = new THREE.Mesh(
+    new THREE.CapsuleGeometry(0.34, 0.36, 8, 18),
+    new THREE.MeshStandardMaterial({ color: 0xdbe7ff, transparent: true, opacity: 0.28, roughness: 0.05, metalness: 0.2, emissive: color, emissiveIntensity: 0.25, depthWrite: false }),
+  )
+  const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.2, 0), new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 1.8, flatShading: true }))
+  const capGeo = new THREE.CylinderGeometry(0.2, 0.24, 0.08, 16)
+  const capMat = new THREE.MeshStandardMaterial({ color: 0x1e2433, metalness: 0.7, roughness: 0.3 })
+  const capTop = new THREE.Mesh(capGeo, capMat)
+  capTop.position.y = 0.55
+  const capBottom = capTop.clone()
+  capBottom.position.y = -0.55
+  capBottom.rotation.x = Math.PI
+  const icon = new THREE.Sprite(new THREE.SpriteMaterial({ map: powerIcon(kind), color: 0xffffff, depthWrite: false, transparent: true }))
+  icon.scale.setScalar(0.5)
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: sharedGlow(), color, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.9 }))
+  halo.scale.setScalar(2.2)
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.025, 6, 32), new THREE.MeshBasicMaterial({ color }))
+  ring.rotation.x = Math.PI / 2
+  ring.position.y = -0.75
+  ring.name = "ring"
+  const { texture, aspect } = labelTexture(label, "info")
+  const lbl = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, depthWrite: false, transparent: true }))
+  lbl.scale.set(0.36 * aspect, 0.36, 1)
+  lbl.position.y = 1.15
+  g.add(halo, shell, core, icon, capTop, capBottom, ring, lbl)
+  g.visible = false
+  return { kind: "commit", power: kind, group: g, active: false, x: 0, y: 0, z: 0, taken: false, t: 0, label: lbl, core }
+}
+
+/** Burbuja del escudo: fresnel azul alrededor del excursionista. */
+export function buildShieldBubble() {
+  const mat = new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    uniforms: { time: { value: 0 }, strength: { value: 1 }, color: { value: new THREE.Color(POWER_COLORS.shield) } },
+    vertexShader: /* glsl */ `
+      varying vec3 vN; varying vec3 vV; varying vec3 vP;
+      void main(){ vec4 mv = modelViewMatrix * vec4(position,1.0); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); vP = position; gl_Position = projectionMatrix * mv; }`,
+    fragmentShader: /* glsl */ `
+      uniform float time; uniform float strength; uniform vec3 color; varying vec3 vN; varying vec3 vV; varying vec3 vP;
+      void main(){
+        float f = pow(1.0 - abs(dot(vN, vV)), 2.2);
+        float hex = 0.5 + 0.5 * sin(vP.y * 18.0 - time * 3.0) * sin(atan(vP.z, vP.x) * 9.0);
+        gl_FragColor = vec4(color * 1.5, (f * 0.9 + hex * 0.08) * strength);
+      }`,
+  })
+  const bubble = new THREE.Mesh(new THREE.SphereGeometry(1.05, 32, 20), mat)
+  bubble.position.y = 0.95
+  bubble.scale.set(0.85, 1.05, 0.85)
+  bubble.visible = false
+  return { mesh: bubble, mat }
+}
+
+/** Líneas de velocidad para el turbo, recicladas alrededor del jugador. */
+export class SpeedLines {
+  readonly object: THREE.LineSegments
+  private readonly pos: Float32Array
+  private readonly seeds: Float32Array
+  constructor(private readonly n = 60) {
+    this.pos = new Float32Array(n * 6)
+    this.seeds = new Float32Array(n * 3)
+    for (let i = 0; i < n; i += 1) {
+      const a = Math.random() * Math.PI * 2
+      const r = 1.6 + Math.random() * 3.2
+      this.seeds.set([Math.cos(a) * r, Math.abs(Math.sin(a)) * r * 0.8 + 0.3, Math.random() * 30], i * 3)
+    }
+    const geo = new THREE.BufferGeometry()
+    geo.setAttribute("position", new THREE.BufferAttribute(this.pos, 3))
+    this.object = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color: 0xffe2a8, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }))
+    this.object.frustumCulled = false
+  }
+  update(x: number, baseY: (z: number) => number, pz: number, speed: number, elapsed: number, strength: number) {
+    const mat = this.object.material as THREE.LineBasicMaterial
+    mat.opacity = strength * 0.7
+    this.object.visible = strength > 0.01
+    if (!this.object.visible) return
+    for (let i = 0; i < this.n; i += 1) {
+      const sx = this.seeds[i * 3]
+      const sy = this.seeds[i * 3 + 1]
+      const off = (this.seeds[i * 3 + 2] + elapsed * speed * 2.2) % 30
+      const z0 = pz - 22 + off
+      const len = 1.2 + speed * 0.12
+      const y0 = baseY(z0) + sy
+      this.pos.set([x + sx, y0, z0, x + sx, y0 + len * 0.13, z0 + len], i * 6)
+    }
+    this.object.geometry.attributes.position.needsUpdate = true
+  }
+}

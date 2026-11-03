@@ -15,8 +15,11 @@ import {
   OverlayCard,
   PrimaryButton,
   SecondaryButton,
+  ShareScore,
   type LabGameProps,
 } from "@/components/lab/ui"
+import { trackLabEvent } from "@/lib/gtag"
+import type { PowerKind } from "@/components/lab/games/summit/entities"
 import { ALT_SUMMIT, MAX_HEALTH, SummitGame, type GameEvent, type HudSnapshot } from "@/components/lab/games/summit/game"
 import { cn } from "@/lib/utils"
 
@@ -34,6 +37,7 @@ const copy = {
       { dot: "bg-[#94a3b8]", text: "Cambios de alcance y deadlines: esquívalos" },
       { dot: "bg-[#4f8cff]", text: "Commits suman puntos; cada 15 y el café recargan la batería" },
       { dot: "bg-[#dbe7ff]", text: "Pasar muy cerca sin chocar da +25" },
+      { dot: "bg-[#ffc46b]", text: "Cápsulas de poder: escudo, turbo, imán y ×2" },
     ],
     play: "Empezar a subir",
     best: "Tu mejor puntaje",
@@ -61,6 +65,22 @@ const copy = {
     streakHeal: "Racha de commits: +10 energía",
     battery: "Batería",
     lowBattery: "Batería baja: busca un café",
+    powers: {
+      shield: { name: "Code review", desc: "Absorbe el próximo golpe" },
+      turbo: { name: "Deploy continuo", desc: "Turbo: atraviesas todo" },
+      magnet: { name: "Git pull", desc: "Atrae los commits" },
+      double: { name: "Doble commit", desc: "Cada commit vale ×2" },
+    } as Record<PowerKind, { name: string; desc: string }>,
+    shieldBlock: "¡El code review atrapó el error!",
+    smash: "¡Deploy! +15",
+    hints: {
+      move: "Cambia de carril con ← → (o desliza)",
+      jump: "¡Salta! Espacio, ↑ o toca la pantalla",
+      dodge: "No se puede saltar: cambia de carril",
+      power: "Un poder: atrápalo",
+    },
+    easy: "Modo relajado",
+    easyHint: "Más lento y con menos daño",
     loading: (p: number) => `Cargando el bosque… ${p}%`,
     left: "Izquierda",
     right: "Derecha",
@@ -79,6 +99,7 @@ const copy = {
       { dot: "bg-[#94a3b8]", text: "Scope changes and deadlines: dodge them" },
       { dot: "bg-[#4f8cff]", text: "Commits add points; every 15 and coffee recharge your battery" },
       { dot: "bg-[#dbe7ff]", text: "Passing very close without crashing gives +25" },
+      { dot: "bg-[#ffc46b]", text: "Power capsules: shield, turbo, magnet and ×2" },
     ],
     play: "Start climbing",
     best: "Your best score",
@@ -106,6 +127,22 @@ const copy = {
     streakHeal: "Commit streak: +10 energy",
     battery: "Battery",
     lowBattery: "Low battery: grab a coffee",
+    powers: {
+      shield: { name: "Code review", desc: "Absorbs the next hit" },
+      turbo: { name: "Continuous deploy", desc: "Turbo: smash through everything" },
+      magnet: { name: "Git pull", desc: "Pulls commits toward you" },
+      double: { name: "Double commit", desc: "Every commit counts ×2" },
+    } as Record<PowerKind, { name: string; desc: string }>,
+    shieldBlock: "Code review caught the error!",
+    smash: "Deploy! +15",
+    hints: {
+      move: "Change lanes with ← → (or swipe)",
+      jump: "Jump! Space, ↑ or tap the screen",
+      dodge: "Can't jump this: change lanes",
+      power: "A power-up: grab it",
+    },
+    easy: "Relaxed mode",
+    easyHint: "Slower, with less damage",
     loading: (p: number) => `Loading the forest… ${p}%`,
     left: "Left",
     right: "Right",
@@ -151,6 +188,31 @@ function Lamp({ on }: { on: boolean }) {
   )
 }
 
+const POWER_HEX: Record<PowerKind, string> = { shield: "#4F8CFF", turbo: "#FFC46B", magnet: "#B57CFF", double: "#34D399" }
+
+/** Chip del poder activo con anillo que se vacía. */
+function PowerChip({ kind, name, frac }: { kind: PowerKind; name: string; frac: number }) {
+  const c = POWER_HEX[kind]
+  const r = 9
+  const len = 2 * Math.PI * r
+  return (
+    <div
+      className="lab-card-in flex h-10 items-center gap-2 rounded-xl border bg-[oklch(0.17_0.025_265/0.82)] px-1.5 text-white sm:pr-3"
+      style={{ borderColor: `${c}66` }}
+      title={name}
+      aria-label={name}
+    >
+      <svg viewBox="0 0 24 24" className="h-7 w-7 -rotate-90" aria-hidden="true">
+        <circle cx="12" cy="12" r={r} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="3" />
+        <circle cx="12" cy="12" r={r} fill="none" stroke={c} strokeWidth="3" strokeLinecap="round" strokeDasharray={`${len * frac} ${len}`} />
+      </svg>
+      <span className="hidden text-xs font-bold sm:inline" style={{ color: c }}>
+        {name}
+      </span>
+    </div>
+  )
+}
+
 export default function SummitGameView({ lang }: LabGameProps) {
   const t = copy[lang]
   const stageRef = useRef<HTMLDivElement>(null)
@@ -165,8 +227,12 @@ export default function SummitGameView({ lang }: LabGameProps) {
   const [coarse, setCoarse] = useState(false)
   const [loadPct, setLoadPct] = useState(0)
   const [ready, setReady] = useState(false)
+  const [easy, setEasy] = useState(false)
+  const [hint, setHint] = useState<{ id: number; text: string } | null>(null)
   const bannerId = useRef(0)
   const langRef = useRef(lang)
+  const easyRef = useRef(false)
+  easyRef.current = easy
   langRef.current = lang
 
   const pushBanner = useCallback((text: string, tone: Banner["tone"]) => {
@@ -190,6 +256,12 @@ export default function SummitGameView({ lang }: LabGameProps) {
           const s = g.stats()
           const prev = readBest("summit")
           const isBest = s.score > prev
+          trackLabEvent("lab_game_end", { game: "sube-el-avila", result: e.phase, score: s.score, altitude: s.altitude })
+          try {
+            localStorage.setItem("avila-lab-summit-tutorial", "1")
+          } catch {
+            // sin almacenamiento
+          }
           if (isBest) writeBest("summit", s.score)
           setBest(Math.max(prev, s.score))
           // Deja ver la escena final antes de la tarjeta
@@ -208,6 +280,14 @@ export default function SummitGameView({ lang }: LabGameProps) {
       else if (e.type === "streak-heal") pushBanner(tt.streakHeal, "good")
       else if (e.type === "loading") setLoadPct(Math.round(e.progress * 100))
       else if (e.type === "ready") setReady(true)
+      else if (e.type === "power") pushBanner(`${tt.powers[e.kind].name}: ${tt.powers[e.kind].desc}`, "good")
+      else if (e.type === "shield-block") pushBanner(tt.shieldBlock, "good")
+      else if (e.type === "smash") pushBanner(tt.smash, "good")
+      else if (e.type === "hint") {
+        const id = Date.now()
+        setHint({ id, text: tt.hints[e.key] })
+        window.setTimeout(() => setHint((h) => (h?.id === id ? null : h)), 2600)
+      }
     }
     const game = new SummitGame(el, langRef.current, setHud, onEvent)
     gameRef.current = game
@@ -225,6 +305,14 @@ export default function SummitGameView({ lang }: LabGameProps) {
   const start = useCallback(() => {
     setStats(null)
     setBanners([])
+    let tutorial = true
+    try {
+      tutorial = localStorage.getItem("avila-lab-summit-tutorial") !== "1"
+    } catch {
+      // sin almacenamiento: mostramos las pistas
+    }
+    gameRef.current?.setOptions({ easy: easyRef.current, tutorial })
+    trackLabEvent("lab_game_start", { game: "sube-el-avila", easy: easyRef.current })
     gameRef.current?.start()
     stageRef.current?.focus()
   }, [])
@@ -382,12 +470,24 @@ export default function SummitGameView({ lang }: LabGameProps) {
                 </span>
               </div>
             </div>
+            {hud.powers.map((pw) => (
+              <PowerChip key={pw.kind} kind={pw.kind} name={t.powers[pw.kind].name} frac={pw.left / pw.total} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Pista del tutorial */}
+      {hint && playing && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-32 z-10 flex justify-center px-4 md:bottom-16" aria-live="assertive">
+          <div key={hint.id} className="lab-card-in rounded-2xl border border-[#4F8CFF]/50 bg-[oklch(0.17_0.025_265/0.92)] px-5 py-3 text-center text-base font-bold text-white shadow-[0_0_40px_-10px_#4F8CFF] md:text-lg">
+            {hint.text}
           </div>
         </div>
       )}
 
       {/* Banners de eventos */}
-      <div className="pointer-events-none absolute inset-x-0 top-36 z-10 flex flex-col items-center gap-2 md:top-8" aria-live="polite">
+      <div className="pointer-events-none absolute inset-x-0 top-[40%] z-10 flex flex-col items-center gap-2 px-4 md:top-8" aria-live="polite">
         {banners.map((b) => (
           <EventBanner key={b.id} id={b.id} text={b.text} tone={b.tone} />
         ))}
@@ -457,7 +557,18 @@ export default function SummitGameView({ lang }: LabGameProps) {
                 ))
               )}
             </div>
-            <div className="mt-7 flex flex-wrap items-center justify-between gap-4">
+            <label className="mt-5 flex cursor-pointer items-center gap-3 text-sm text-[oklch(0.85_0.02_257)]">
+              <input
+                type="checkbox"
+                checked={easy}
+                onChange={(e) => setEasy(e.target.checked)}
+                className="h-5 w-5 accent-[#4F8CFF]"
+              />
+              <span>
+                <span className="font-semibold text-white">{t.easy}</span> · {t.easyHint}
+              </span>
+            </label>
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
               {ready ? (
                 <PrimaryButton onClick={start} autoFocus>
                   <Play className="h-4 w-4" />
@@ -532,7 +643,20 @@ export default function SummitGameView({ lang }: LabGameProps) {
                 </span>
               )}
             </div>
-            <LabCta lang={lang} line={stats.won ? t.wonLine : t.lostLine} />
+            <div className="mt-3">
+              <ShareScore
+                lang={lang}
+                game="sube-el-avila"
+                title={t.title}
+                score={stats.score}
+                stats={[
+                  { label: t.altitude, value: `${stats.altitude.toLocaleString(lang === "es" ? "es-VE" : "en-US")} m` },
+                  { label: t.commits, value: String(stats.commits) },
+                  { label: t.time, value: formatTime(stats.time) },
+                ]}
+              />
+            </div>
+            <LabCta lang={lang} game="sube-el-avila" line={stats.won ? t.wonLine : t.lostLine} />
           </OverlayCard>
         </GameOverlay>
       )}

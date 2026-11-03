@@ -1,5 +1,6 @@
 "use client"
 
+import { trackLabEvent } from "@/lib/gtag"
 import { useCallback, useEffect, useRef, useState, type ComponentType } from "react"
 import Link from "next/link"
 import {
@@ -232,6 +233,7 @@ export default function BuilderGame({ lang }: LabGameProps) {
   }
 
   const finish = () => {
+    trackLabEvent("lab_build_done", { game: "arma-tu-app", platform: build.platform ?? "", modules: build.modules.length })
     if (!platform) return
     try {
       window.history.replaceState(window.history.state, "", `${window.location.pathname}?build=${encodeBuild(build)}`)
@@ -487,6 +489,7 @@ export default function BuilderGame({ lang }: LabGameProps) {
             <div className="mt-5 flex flex-col gap-2">
               <Link
                 href={quoteHref(build, lang)}
+                onClick={() => trackLabEvent("lab_quote_click", { game: "arma-tu-app", modules: build.modules.length })}
                 autoFocus
                 className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#0B0F1A] transition-colors hover:bg-[oklch(0.92_0.02_255)]"
               >
@@ -499,6 +502,7 @@ export default function BuilderGame({ lang }: LabGameProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   data-wa-inline
+                  onClick={() => trackLabEvent("lab_whatsapp_click", { game: "arma-tu-app" })}
                   className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-3 py-2.5 text-sm font-semibold transition-colors hover:border-white/50"
                 >
                   <WhatsAppIcon className="h-4 w-4 text-[#25D366]" />

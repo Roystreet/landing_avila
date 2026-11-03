@@ -51,7 +51,8 @@ export default function RootLayout({
                 function gtag(){dataLayer.push(arguments);}
                 window.gtag = gtag;
                 gtag('js', new Date());
-                gtag('config', '${googleAdsId}');
+                gtag('config', '${googleAdsId}');${adsConfig.analyticsId ? `
+                gtag('config', '${adsConfig.analyticsId}');` : ""}
               `}
             </Script>
           </>

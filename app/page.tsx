@@ -4,6 +4,7 @@ import ProcessBand from "@/components/sections/home/process-band"
 import Projects from "@/components/sections/home/projects"
 import Trust from "@/components/sections/home/trust"
 import CtaBand from "@/components/sections/home/cta-band"
+import LabTeaser from "@/components/sections/home/lab-teaser"
 import Footer from "@/components/layout/footer"
 
 export default function HomePage() {
@@ -14,6 +15,7 @@ export default function HomePage() {
       <ProcessBand />
       <Projects />
       <Trust />
+      <LabTeaser />
       <CtaBand />
       <Footer />
     </div>

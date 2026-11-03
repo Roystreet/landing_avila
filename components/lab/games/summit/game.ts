@@ -24,7 +24,13 @@ import {
   buildBug,
   buildCoffee,
   buildCommit,
+  buildPowerPickup,
+  buildShieldBubble,
   CommitField,
+  POWER_COLORS,
+  SpeedLines,
+  type PowerKind,
+  type PowerPickup,
   buildDeadline,
   buildHiker,
   buildMeeting,
@@ -55,6 +61,11 @@ const PLAYER_HALF_W = 0.27
 const PLAYER_HALF_D = 0.22
 const PLAYER_HEIGHT = 1.62
 
+// Poderes: duración en segundos
+export const POWER_DURATION: Record<PowerKind, number> = { shield: 12, turbo: 4.5, magnet: 9, double: 10 }
+const POWER_ORDER: PowerKind[] = ["shield", "turbo", "magnet", "double"]
+const HIT_SOUND = { bug: "hit-bug", boulder: "hit-rock", deadline: "hit-metal", meeting: "hit-wood" } as const
+
 export type Phase = "intro" | "playing" | "paused" | "won" | "lost"
 
 export type HudSnapshot = {
@@ -66,6 +77,7 @@ export type HudSnapshot = {
   speed: number
   bonus: number
   elapsed: number
+  powers: { kind: PowerKind; left: number; total: number }[]
 }
 
 export type GameEvent =
@@ -79,6 +91,10 @@ export type GameEvent =
   | { type: "streak-heal" }
   | { type: "loading"; progress: number }
   | { type: "ready" }
+  | { type: "power"; kind: PowerKind }
+  | { type: "shield-block" }
+  | { type: "smash"; kind: ObstacleKind }
+  | { type: "hint"; key: "move" | "jump" | "dodge" | "power" }
 
 const TEXT = {
   es: {
@@ -87,6 +103,7 @@ const TEXT = {
     deadline: "deadline",
     meeting: "reunión de 5 min",
     coffee: "+35 energía",
+    powers: { shield: "code review", turbo: "deploy continuo", magnet: "git pull", double: "doble commit" },
     milestones: [
       { at: 0.25, name: "Sabas Nieves", sub: "Vas bien" },
       { at: 0.5, name: "No te apures", sub: "Mitad del camino" },
@@ -100,6 +117,7 @@ const TEXT = {
     deadline: "deadline",
     meeting: "quick 5-min sync",
     coffee: "+35 energy",
+    powers: { shield: "code review", turbo: "continuous deploy", magnet: "git pull", double: "double commit" },
     milestones: [
       { at: 0.25, name: "Sabas Nieves", sub: "Looking good" },
       { at: 0.5, name: "No te apures", sub: "Halfway there" },
@@ -152,6 +170,18 @@ export class SummitGame {
   private disposed = false
   private ready = false
   private heartbeat = 0
+  private powers: Record<PowerKind, number> = { shield: 0, turbo: 0, magnet: 0, double: 0 }
+  private powerPickups: PowerPickup[] = []
+  private shield!: ReturnType<typeof buildShieldBubble>
+  private speedLines = new SpeedLines()
+  private healCounter = 0
+  private easy = false
+  private tutorial = false
+  private hinted = new Set<string>()
+  private stepPhase = 0
+  private fpsAcc = 0
+  private fpsFrames = 0
+  private quality = 2
   private commits = 0
   private combo = 0
   private comboTimer = 0
@@ -251,6 +281,14 @@ export class SummitGame {
     this.hiker = buildHiker()
     this.scene.add(this.hiker.root)
     this.scene.add(this.sparks.points)
+    for (const kind of POWER_ORDER) {
+      const pp = buildPowerPickup(kind, t.powers[kind])
+      this.powerPickups.push(pp)
+      this.scene.add(pp.group)
+    }
+    this.shield = buildShieldBubble()
+    this.hiker.root.add(this.shield.mesh)
+    this.scene.add(this.speedLines.object)
 
     for (let i = 0; i < 6; i += 1) this.obstacles.push(buildBug(t.bug))
     for (let i = 0; i < 4; i += 1) this.obstacles.push(buildBoulder(t.boulder))
@@ -274,6 +312,7 @@ export class SummitGame {
     const t = TEXT[lang]
     for (const o of this.obstacles) setLabel(o.label, t[o.kind])
     for (const c of this.coffees) setLabel(c.label, t.coffee)
+    for (const pp of this.powerPickups) setLabel(pp.label, t.powers[pp.power])
   }
 
   // ---------- Control ----------
@@ -284,6 +323,12 @@ export class SummitGame {
 
   isReady() {
     return this.ready
+  }
+
+  /** Modo relajado: más lento y menos daño. Tutorial: pistas y cámara lenta la primera vez. */
+  setOptions(opts: { easy: boolean; tutorial: boolean }) {
+    this.easy = opts.easy
+    this.tutorial = opts.tutorial
   }
 
   start() {
@@ -325,6 +370,13 @@ export class SummitGame {
     this.prevX = 0
     this.prevPz = 0
     this.slowmo = 0
+    this.powers = { shield: 0, turbo: 0, magnet: 0, double: 0 }
+    this.healCounter = 0
+    this.hinted.clear()
+    for (const pp of this.powerPickups) {
+      pp.active = false
+      pp.group.visible = false
+    }
     this.commits = 0
     this.combo = 0
     this.invuln = 0
@@ -408,6 +460,19 @@ export class SummitGame {
     p.group.scale.setScalar(1)
   }
 
+  private spawnPower(kind: PowerKind, z: number, lane: number) {
+    const pp = this.powerPickups.find((p) => p.power === kind)
+    if (!pp) return
+    pp.active = true
+    pp.taken = false
+    pp.group.visible = true
+    pp.x = LANE_X[lane]
+    pp.y = 0.95
+    pp.z = z
+    pp.t = 0
+    pp.group.scale.setScalar(1)
+  }
+
   private spawnCoffee(z: number, lane: number) {
     const c = this.coffees.find((k) => !k.active)
     if (!c) return
@@ -446,7 +511,8 @@ export class SummitGame {
       if (later) this.spawnObstacle("boulder", z - 20, (lane + 1) % 3)
       length = later ? 22 : 16
     } else if (roll < 0.62) {
-      const free = r.int(0, 2)
+      // La valla cubre dos carriles contiguos: el libre siempre es un extremo
+      const free = r.chance(0.5) ? 0 : 2
       this.spawnObstacle("deadline", z, 0, free)
       for (let i = 0; i < 3; i += 1) this.spawnCommit(LANE_X[free], 0.6, z + 2 - i * 2)
       if (late && r.chance(0.5)) this.spawnObstacle("bug", z - 7, free)
@@ -468,6 +534,11 @@ export class SummitGame {
       length = 15
     }
     if (this.health < 80 && r.chance(this.health < 50 ? 0.2 : 0.1)) this.spawnCoffee(z - length * 0.6, r.int(0, 2))
+    // Poder: raro, uno a la vez y nunca el que ya está activo
+    if (progress > 0.07 && r.chance(0.13) && !this.powerPickups.some((p) => p.active)) {
+      const options = POWER_ORDER.filter((k) => this.powers[k] <= 0 && (k !== "shield" || this.health < MAX_HEALTH || r.chance(0.5)))
+      if (options.length) this.spawnPower(r.pick(options), z - length * 0.5, r.int(0, 2))
+    }
     const density = THREE.MathUtils.lerp(1.35, 0.85, progress)
     return length * density
   }
@@ -505,6 +576,8 @@ export class SummitGame {
     this.updateEntities(this.phase === "paused" ? 0 : dt, elapsed)
     this.world.update(this.phase === "paused" ? 0 : rawDt, elapsed, -this.distance)
     this.commitField.sync(this.pickups)
+    this.updatePowersFx(rawDt, elapsed)
+    this.adaptQuality(rawDt)
     this.sparks.update(this.phase === "paused" ? 0 : rawDt)
     this.tweens.update(rawDt)
 
@@ -532,8 +605,16 @@ export class SummitGame {
     this.runTime += dt
     this.prevPz = -this.distance
     const progress = this.distance / TRACK_LENGTH
-    const targetSpeed = THREE.MathUtils.lerp(10.5, 17.5, Math.min(1, progress * 1.1))
-    this.speed = damp(this.speed, targetSpeed, 1.5, dt)
+    const base = THREE.MathUtils.lerp(10.5, 17.5, Math.min(1, progress * 1.1)) * (this.easy ? 0.82 : 1)
+    const targetSpeed = this.powers.turbo > 0 ? base * 1.45 : base
+    this.speed = damp(this.speed, targetSpeed, this.powers.turbo > 0 ? 4 : 1.5, dt)
+    for (const k of POWER_ORDER) {
+      if (this.powers[k] > 0) {
+        this.powers[k] = Math.max(0, this.powers[k] - dt)
+        if (this.powers[k] === 0) this.emitHud(true)
+      }
+    }
+    this.updateHints()
     this.distance += this.speed * dt
 
     // Intenciones del jugador
@@ -681,10 +762,22 @@ export class SummitGame {
     for (const p of this.pickups) {
       if (!p.active || p.taken) continue
       const dz = p.z - pz
-      if (dz < 3 && dz > -1 && Math.abs(p.x - this.x) < 1.3) p.x = damp(p.x, this.x, 6, 1 / 60)
+      if (this.powers.magnet > 0 && dz < 16 && dz > -1 && Math.abs(p.x - this.x) < 6) {
+        // Git pull: los commits vuelan hacia el jugador
+        // Avanza una cuarta parte de la distancia por cuadro: siempre alcanza al jugador
+        p.x += (this.x - p.x) * 0.25
+        p.y += (feet + 0.9 - p.y) * 0.25
+        p.z += (pz - 0.4 - p.z) * 0.25
+      } else if (dz < 3 && dz > -1 && Math.abs(p.x - this.x) < 1.3) p.x = damp(p.x, this.x, 6, 1 / 60)
       const dx = p.x - this.x
       const dy = p.y - (feet + 0.9)
-      if (dx * dx + dy * dy * 0.5 + dz * dz < 0.85 * 0.85) this.collectCommit(p)
+      const reach = this.powers.magnet > 0 ? 1.5 : 0.85
+      if (dx * dx + dy * dy * 0.5 + dz * dz < reach * reach) this.collectCommit(p)
+    }
+    for (const pp of this.powerPickups) {
+      if (!pp.active || pp.taken) continue
+      const dz = pp.z - pz
+      if (Math.abs(dz) < 1 && Math.abs(pp.x - this.x) < 0.9 && feet < 1.6) this.collectPower(pp)
     }
     for (const c of this.coffees) {
       if (!c.active || c.taken) continue
@@ -698,24 +791,52 @@ export class SummitGame {
     this.emitHud(true)
   }
 
+  private knockAway(o: Obstacle, force = 1) {
+    o.knock = { vx: (o.x - this.x || 1) * 3 * force + (this.rng.next() - 0.5) * 4, vy: 6 * force, vz: -4 * force, spin: 10, y: 0 }
+    o.label.visible = false
+  }
+
   private takeHit(o: Obstacle) {
     o.hit = true
     o.passed = true
-    this.setHealth(this.health - DAMAGE[o.kind])
+    const at = new THREE.Vector3(this.x, groundY(-this.distance) + 0.8, -this.distance - 0.4)
+    if (this.powers.turbo > 0) {
+      // Deploy continuo: atraviesa todo y suma puntos
+      this.bonus += 15
+      this.shake.add(0.25)
+      labAudio.play(HIT_SOUND[o.kind], this.rng.next())
+      this.sparks.burst(at, POWER_COLORS.turbo, this.reduced ? 8 : 30, 6, this.rng.next)
+      if (o.kind === "bug" || o.kind === "boulder") this.knockAway(o, 1.6)
+      else o.group.visible = false
+      this.vibrate(25)
+      this.onEvent({ type: "smash", kind: o.kind })
+      return
+    }
+    if (this.powers.shield > 0) {
+      // Code review: el escudo se rompe en lugar del jugador
+      this.powers.shield = 0
+      this.invuln = 0.9
+      this.shake.add(0.3)
+      labAudio.play("shield-break", this.rng.next())
+      this.sparks.burst(at, POWER_COLORS.shield, this.reduced ? 10 : 40, 5, this.rng.next)
+      if (o.kind === "bug" || o.kind === "boulder") this.knockAway(o)
+      this.vibrate(40)
+      this.onEvent({ type: "shield-block" })
+      this.emitHud(true)
+      return
+    }
+    this.setHealth(this.health - DAMAGE[o.kind] * (this.easy ? 0.6 : 1))
     this.invuln = 1.3
     this.combo = 0
     this.hitstop = this.reduced ? 0 : 0.085
     this.shake.add(0.5)
     if (!this.reduced) this.fovPunch = 7
     this.speed *= 0.72
-    labAudio.play("hit", this.rng.next())
-    const at = new THREE.Vector3(this.x, groundY(-this.distance) + 0.8, -this.distance - 0.4)
+    labAudio.play(HIT_SOUND[o.kind], this.rng.next())
     this.sparks.burst(at, 0xff4d5e, this.reduced ? 10 : 40, 4.5, this.rng.next)
+    this.vibrate(70)
     // El obstáculo sale despedido
-    if (o.kind === "bug" || o.kind === "boulder") {
-      o.knock = { vx: (o.x - this.x || 1) * 3 + (this.rng.next() - 0.5) * 4, vy: 6, vz: -4, spin: 10, y: 0 }
-      o.label.visible = false
-    }
+    if (o.kind === "bug" || o.kind === "boulder") this.knockAway(o)
     this.onEvent({ type: "hit", kind: o.kind })
     if (this.health <= 0) this.lose()
   }
@@ -724,7 +845,8 @@ export class SummitGame {
   private graze(o: Obstacle) {
     this.laneIndex = this.laneFrom
     this.lean = this.laneIndex > this.laneFrom ? -1.4 : 1.4
-    this.setHealth(this.health - GRAZE_DAMAGE)
+    if (this.powers.shield <= 0 && this.powers.turbo <= 0) this.setHealth(this.health - GRAZE_DAMAGE * (this.easy ? 0.6 : 1))
+    this.vibrate(30)
     this.invuln = 0.45
     this.combo = 0
     this.shake.add(0.22)
@@ -744,7 +866,9 @@ export class SummitGame {
 
   private collectCommit(p: Pickup) {
     p.taken = true
-    this.commits += 1
+    const gain = this.powers.double > 0 ? 2 : 1
+    this.commits += gain
+    this.healCounter += 1
     this.combo = this.comboTimer > 0 ? this.combo + 1 : 1
     this.comboTimer = 1.2
     labAudio.play(this.combo >= 5 && this.combo % 5 === 0 ? "combo" : "pickup", Math.min(1, 0.3 + this.combo * 0.06))
@@ -761,7 +885,9 @@ export class SummitGame {
       { onComplete: () => ((p.active = false), (p.group.visible = false)) },
     )
     this.onEvent({ type: "commit", combo: this.combo })
-    if (this.commits % 15 === 0 && this.health < MAX_HEALTH) {
+    if (this.healCounter >= 15) {
+      this.healCounter = 0
+      if (this.health >= MAX_HEALTH) return
       this.setHealth(this.health + STREAK_HEAL)
       this.onEvent({ type: "streak-heal" })
     }
@@ -770,12 +896,56 @@ export class SummitGame {
   private collectCoffee(c: Pickup) {
     c.taken = true
     this.setHealth(this.health + COFFEE_HEAL)
-    labAudio.play("milestone")
+    labAudio.play("coffee")
+    this.vibrate(20)
     this.sparks.burst(new THREE.Vector3(c.x, groundY(c.z) + 0.5, c.z), 0xffc46b, this.reduced ? 8 : 26, 3, this.rng.next)
     this.tweens.tween(0.35, (v) => c.group.scale.setScalar(1 + v * 0.8 - v * v * 1.8), {
       onComplete: () => ((c.active = false), (c.group.visible = false)),
     })
     this.onEvent({ type: "coffee" })
+  }
+
+  private collectPower(pp: PowerPickup) {
+    pp.taken = true
+    this.powers[pp.power] = POWER_DURATION[pp.power]
+    labAudio.play("powerup", this.rng.next())
+    labAudio.play(pp.power === "shield" ? "toggle" : pp.power === "turbo" ? "boost" : pp.power === "magnet" ? "magnet" : "double")
+    if (pp.power === "turbo" && !this.reduced) this.fovPunch = 8
+    this.sparks.burst(new THREE.Vector3(pp.x, groundY(pp.z) + 1, pp.z), POWER_COLORS[pp.power], this.reduced ? 10 : 36, 4, this.rng.next)
+    this.vibrate(35)
+    this.tweens.tween(0.3, (v) => pp.group.scale.setScalar(1 + v - v * v * 2), {
+      onComplete: () => ((pp.active = false), (pp.group.visible = false)),
+    })
+    this.onEvent({ type: "power", kind: pp.power })
+    this.emitHud(true)
+  }
+
+  private vibrate(ms: number) {
+    if (this.reduced) return
+    try {
+      navigator.vibrate?.(ms)
+    } catch {
+      // sin vibración
+    }
+  }
+
+  /** Pistas del tutorial: aparecen la primera vez que algo nuevo entra en escena. */
+  private updateHints() {
+    if (!this.tutorial) return
+    const pz = -this.distance
+    const hint = (key: "move" | "jump" | "dodge" | "power") => {
+      if (this.hinted.has(key)) return
+      this.hinted.add(key)
+      this.slowmo = 0.9
+      this.onEvent({ type: "hint", key })
+    }
+    if (this.runTime > 0.6) hint("move")
+    for (const o of this.obstacles) {
+      if (!o.active || o.hit) continue
+      const ahead = pz - o.z
+      if (ahead > 0 && ahead < 17) hint(o.kind === "bug" || o.kind === "meeting" ? "jump" : "dodge")
+    }
+    for (const pp of this.powerPickups) if (pp.active && pz - pp.z > 0 && pz - pp.z < 18) hint("power")
   }
 
   private squash(sy: number) {
@@ -892,6 +1062,12 @@ export class SummitGame {
     const h = this.hiker
     const pz = -this.distance
     this.stride += dt * this.speed * 0.95
+    // Un paso cada medio ciclo de zancada
+    const step = Math.floor(this.stride / Math.PI)
+    if (step !== this.stepPhase) {
+      this.stepPhase = step
+      if (this.grounded && this.phase === "playing") labAudio.play("step", this.rng.next())
+    }
     if (this.grounded) {
       this.animateLimbs(0.5, this.stride)
       h.body.position.y = Math.abs(Math.sin(this.stride)) * 0.08
@@ -996,6 +1172,58 @@ export class SummitGame {
     this.camera.lookAt(look)
   }
 
+  private updatePowersFx(dt: number, elapsed: number) {
+    const pz = -this.distance
+    for (const pp of this.powerPickups) {
+      if (!pp.active) continue
+      if (!pp.taken) {
+        pp.t += dt
+        pp.group.position.set(pp.x, groundY(pp.z) + pp.y + Math.sin(pp.t * 2.4) * 0.12, pp.z)
+        pp.core.rotation.y = pp.t * 2
+        pp.core.rotation.x = pp.t * 1.3
+        const ring = pp.group.getObjectByName("ring")!
+        ring.scale.setScalar(1 + Math.sin(pp.t * 4) * 0.12)
+      }
+      if (pp.z > pz + 10) {
+        pp.active = false
+        pp.group.visible = false
+      }
+    }
+    // Escudo: parpadea los últimos 2 segundos
+    const sh = this.powers.shield
+    this.shield.mesh.visible = sh > 0 && (sh > 2 || Math.floor(sh * 8) % 2 === 0)
+    this.shield.mat.uniforms.time.value = elapsed
+    // Turbo: líneas de velocidad y FOV sostenido
+    const turbo = this.powers.turbo > 0 ? Math.min(1, this.powers.turbo / 0.5) : 0
+    this.speedLines.update(this.x, groundY, pz, this.speed, elapsed, this.reduced ? 0 : turbo)
+    if (turbo > 0 && !this.reduced) this.fovPunch = Math.max(this.fovPunch, 6 * turbo)
+  }
+
+  /** Si el equipo no da 45 fps, baja calidad por pasos: bloom, resolución, sombras. */
+  private adaptQuality(dt: number) {
+    if (this.phase !== "playing" || this.quality === 0) return
+    this.fpsAcc += dt
+    this.fpsFrames += 1
+    if (this.fpsAcc < 2.5) return
+    const fps = this.fpsFrames / this.fpsAcc
+    this.fpsAcc = 0
+    this.fpsFrames = 0
+    if (fps >= 45) return
+    const { renderer } = this.ctx
+    if (this.composer) {
+      this.composer.dispose()
+      this.composer = null
+      this.bloom = null
+    } else if (this.quality === 2) {
+      renderer.setPixelRatio(1)
+      this.quality = 1
+    } else {
+      renderer.shadowMap.enabled = false
+      this.moon.castShadow = false
+      this.quality = 0
+    }
+  }
+
   private emitHud(force = false) {
     if (!force && this.phase !== "playing") return
     const progress = Math.min(1, this.distance / TRACK_LENGTH)
@@ -1006,6 +1234,7 @@ export class SummitGame {
       commits: this.commits,
       health: this.health,
       bonus: this.bonus,
+      powers: POWER_ORDER.filter((k) => this.powers[k] > 0).map((k) => ({ kind: k, left: this.powers[k], total: POWER_DURATION[k] })),
       speed: this.speed,
       elapsed: this.runTime,
     })

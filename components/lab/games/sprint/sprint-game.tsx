@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { AppWindow, Bug, Cloud, Pause, Play, RotateCcw, Smartphone, Zap } from "lucide-react"
-import { LifeBar,
+import { ShareScore, LifeBar,
   GameOverlay,
   HudButton,
   Kbd,
@@ -15,6 +15,7 @@ import { LifeBar,
   type LabGameProps,
 } from "@/components/lab/ui"
 import { labAudio } from "@/components/lab/engine/audio"
+import { trackLabEvent } from "@/lib/gtag"
 import { isCoarsePointer, prefersReducedMotion, readBest, writeBest } from "@/components/lab/engine/core"
 import { getLabGame } from "@/lib/lab-games"
 import { cn } from "@/lib/utils"
@@ -169,6 +170,7 @@ export default function SprintGame({ lang }: LabGameProps) {
           setBanner({ id: bannerId, text, tone })
         },
         onEnd: (r) => {
+          trackLabEvent("lab_game_end", { game: "sprint-de-entrega", result: r.reason, score: r.score })
           const prev = readBest("sprint")
           const isBest = r.score > prev
           if (isBest) writeBest("sprint", r.score)
@@ -208,6 +210,7 @@ export default function SprintGame({ lang }: LabGameProps) {
     setBanner(null)
     setHud(INITIAL_HUD)
     engineRef.current?.start()
+    trackLabEvent("lab_game_start", { game: "sprint-de-entrega" })
     setPhase("play")
   }, [setPhase])
 
@@ -506,9 +509,20 @@ export default function SprintGame({ lang }: LabGameProps) {
                 <RotateCcw className="h-4 w-4" />
                 {t.again}
               </PrimaryButton>
+              <ShareScore
+                lang={lang}
+                game="sprint-de-entrega"
+                title={lang === "es" ? "Sprint de entrega" : "Delivery Sprint"}
+                score={result.score}
+                stats={[
+                  { label: t.delivered, value: String(result.delivered) },
+                  { label: t.accuracy, value: `${result.accuracy}%` },
+                  { label: t.maxCombo, value: `x${result.maxMult}` },
+                ]}
+              />
               {!coarse && <Kbd>R</Kbd>}
             </div>
-            <LabCta lang={lang} line={t.cta} />
+            <LabCta lang={lang} game="sprint-de-entrega" line={t.cta} />
           </OverlayCard>
         </GameOverlay>
       )}

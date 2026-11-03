@@ -4,10 +4,12 @@
 // tarjetas de inicio/fin y la llamada a cotizar al terminar una partida.
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import Link from "next/link"
-import { ArrowRight, Volume2, VolumeX } from "lucide-react"
+import { ArrowRight, Share2, Volume2, VolumeX } from "lucide-react"
 import { labAudio } from "@/components/lab/engine/audio"
 import { WhatsAppIcon } from "@/components/brand/whatsapp-icon"
 import { WHATSAPP_URL } from "@/lib/contact"
+import { RIDGE_POINTS, SUMMIT } from "@/components/brand/ridge"
+import { trackLabEvent } from "@/lib/gtag"
 import type { Language } from "@/components/providers/language-provider"
 import { cn } from "@/lib/utils"
 
@@ -156,7 +158,17 @@ export function HudStat({ label, value, icon }: { label: string; value: ReactNod
 }
 
 /** Cierre de partida: lleva a cotizar o a WhatsApp sin romper el tono del juego. */
-export function LabCta({ lang, line, quoteHref = "/cotizacion" }: { lang: Language; line?: string; quoteHref?: string }) {
+export function LabCta({
+  lang,
+  line,
+  quoteHref = "/cotizacion",
+  game,
+}: {
+  lang: Language
+  line?: string
+  quoteHref?: string
+  game?: string
+}) {
   const t =
     lang === "es"
       ? { quote: "Cotizar mi proyecto", wa: "WhatsApp" }
@@ -167,6 +179,7 @@ export function LabCta({ lang, line, quoteHref = "/cotizacion" }: { lang: Langua
       <div className="mt-4 flex flex-col gap-2 sm:flex-row">
         <Link
           href={quoteHref}
+          onClick={() => trackLabEvent("lab_quote_click", { game: game ?? "lab" })}
           className="group inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#0B0F1A] transition-colors hover:bg-[oklch(0.92_0.02_255)]"
         >
           {t.quote}
@@ -177,6 +190,7 @@ export function LabCta({ lang, line, quoteHref = "/cotizacion" }: { lang: Langua
           target="_blank"
           rel="noopener noreferrer"
           data-wa-inline
+          onClick={() => trackLabEvent("lab_whatsapp_click", { game: game ?? "lab" })}
           className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:border-white/50"
         >
           <WhatsAppIcon className="h-4 w-4 text-[#25D366]" />
@@ -290,5 +304,121 @@ export function LifeBar({
         ))}
       </div>
     </div>
+  )
+}
+
+/** Dibuja la tarjeta del récord (1080×1080) con la cresta de marca. */
+async function scoreCard(title: string, score: string, stats: { label: string; value: string }[], footer: string) {
+  const c = document.createElement("canvas")
+  c.width = c.height = 1080
+  const g = c.getContext("2d")!
+  const sky = g.createLinearGradient(0, 0, 0, 1080)
+  sky.addColorStop(0, "#070A12")
+  sky.addColorStop(1, "#1B2A52")
+  g.fillStyle = sky
+  g.fillRect(0, 0, 1080, 1080)
+  for (let i = 0; i < 90; i += 1) {
+    g.fillStyle = `rgba(219,231,255,${0.2 + ((i * 37) % 10) / 14})`
+    g.fillRect((i * 263) % 1080, (i * 151) % 560, 2, 2)
+  }
+  // Cresta del Ávila y luz de la cumbre
+  const sx = 1080 / 1440
+  g.beginPath()
+  g.moveTo(0, 1080)
+  RIDGE_POINTS.forEach(([x, y]) => g.lineTo(x * sx, 760 + y * 1.2))
+  g.lineTo(1080, 1080)
+  g.closePath()
+  g.fillStyle = "#0B0F1A"
+  g.fill()
+  g.beginPath()
+  RIDGE_POINTS.forEach(([x, y], i) => (i ? g.lineTo(x * sx, 760 + y * 1.2) : g.moveTo(x * sx, 760 + y * 1.2)))
+  g.strokeStyle = "rgba(79,140,255,0.8)"
+  g.lineWidth = 3
+  g.stroke()
+  const glow = g.createRadialGradient(SUMMIT.x * sx, 760 + SUMMIT.y * 1.2, 0, SUMMIT.x * sx, 760 + SUMMIT.y * 1.2, 90)
+  glow.addColorStop(0, "rgba(219,231,255,1)")
+  glow.addColorStop(0.2, "rgba(79,140,255,0.6)")
+  glow.addColorStop(1, "rgba(79,140,255,0)")
+  g.fillStyle = glow
+  g.fillRect(0, 600, 1080, 400)
+  if (document.fonts?.ready) await document.fonts.ready
+  const font = getComputedStyle(document.body).fontFamily || "system-ui"
+  g.fillStyle = "#94A3B8"
+  g.font = `600 40px ${font}`
+  g.fillText("AVILA LAB", 80, 130)
+  g.fillStyle = "#FFFFFF"
+  g.font = `800 76px ${font}`
+  g.fillText(title, 80, 220)
+  g.fillStyle = "#4F8CFF"
+  g.font = `800 190px ${font}`
+  g.fillText(score, 76, 430)
+  g.font = `600 40px ${font}`
+  stats.slice(0, 3).forEach((st, i) => {
+    const x = 80 + i * 320
+    g.fillStyle = "#94A3B8"
+    g.fillText(st.label.toUpperCase(), x, 520)
+    g.fillStyle = "#FFFFFF"
+    g.font = `700 56px ${font}`
+    g.fillText(st.value, x, 590)
+    g.font = `600 40px ${font}`
+  })
+  g.fillStyle = "#DBE7FF"
+  g.font = `600 36px ${font}`
+  g.fillText(footer, 80, 1020)
+  return new Promise<Blob | null>((resolve) => c.toBlob(resolve, "image/png"))
+}
+
+/** "Comparte tu récord": imagen + enlace por el menú nativo; si no hay, WhatsApp. */
+export function ShareScore({
+  lang,
+  game,
+  title,
+  score,
+  stats,
+}: {
+  lang: Language
+  game: string
+  title: string
+  score: number
+  stats: { label: string; value: string }[]
+}) {
+  const [busy, setBusy] = useState(false)
+  const url = typeof window !== "undefined" ? `${window.location.origin}/lab/${game}` : `https://avilasystem.com/lab/${game}`
+  const scoreText = score.toLocaleString(lang === "es" ? "es-VE" : "en-US")
+  const text =
+    lang === "es"
+      ? `Hice ${scoreText} puntos en ${title} del Avila Lab. ¿Me superas?`
+      : `I scored ${scoreText} in ${title} at Avila Lab. Can you beat me?`
+
+  const share = async () => {
+    setBusy(true)
+    trackLabEvent("lab_share", { game, score })
+    try {
+      const blob = await scoreCard(title, scoreText, stats, url.replace(/^https?:\/\//, ""))
+      const file = blob ? new File([blob], `avila-lab-${game}.png`, { type: "image/png" }) : null
+      if (file && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], text, url })
+      } else if (navigator.share) {
+        await navigator.share({ text, url })
+      } else {
+        window.open(`https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`, "_blank", "noopener")
+      }
+    } catch {
+      // el usuario canceló
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={share}
+      disabled={busy}
+      className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-white/20 px-5 py-3 text-base font-semibold text-white transition-colors hover:border-white/50 hover:bg-white/5 disabled:opacity-60"
+    >
+      <Share2 className="h-4 w-4" />
+      {lang === "es" ? "Compartir récord" : "Share score"}
+    </button>
   )
 }
